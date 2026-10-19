@@ -171,7 +171,6 @@ export function adaptData({ data }: DataResult): InitData {
     navigation,
     content,
     meta: data.meta,
-    contentLinkTargets: linkTargets(source),
     sidebar: tree && sidebarItems(tree),
     docCollections: source.collections?.map((collection) => ({
       ...collection,
@@ -183,35 +182,5 @@ export function adaptData({ data }: DataResult): InitData {
     })),
     cardTagTree: source.cardTagTree && cardTags(source.cardTagTree),
     search: { href: new URL(source.search.data, manifestResourceUrl).href },
-    settings: source.settings as InitData["settings"],
   };
-}
-
-/** 站内链接目标键为 `${contentType}:${refId}`：卡片、文章即清单 key，项目条目查清单 contentLinkTargets。 */
-const linkTargetCache = new WeakMap<DataManifest, InitData["contentLinkTargets"]>();
-function linkTargets(source: DataManifest): InitData["contentLinkTargets"] {
-  let targets = linkTargetCache.get(source);
-  if (!targets) {
-    const refs: [string, ContentRef][] = [
-      ...source.items
-        .filter((item) => item.type === "card" || item.type === "article")
-        .map((item): [string, ContentRef] => [item.key, item]),
-      ...Object.entries(source.contentLinkTargets ?? {}),
-    ];
-    targets = Object.fromEntries(
-      refs.map(([identity, ref]) => [
-        identity,
-        {
-          key: ref.key,
-          type: ref.type,
-          id: ref.id,
-          contentType: identity.slice(0, identity.lastIndexOf(":")),
-          refId: Number(identity.slice(identity.lastIndexOf(":") + 1)),
-          href: routeFor(ref),
-        },
-      ]),
-    );
-    linkTargetCache.set(source, targets);
-  }
-  return targets;
 }

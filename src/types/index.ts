@@ -1,9 +1,5 @@
 import { Descendant } from "slate";
 import type { SearchDocument } from "@tau/blog";
-import {
-  type ImageBorderRadiusPreset,
-  type ImageShadowPreset,
-} from "@tau/blog/media";
 
 // 站点配置
 export interface SiteConfig {
@@ -182,14 +178,6 @@ export interface DocCollection {
   items: DocCollectionItem[];
 }
 
-export interface ContentLinkTarget {
-  key: string;
-  contentType: string;
-  refId: number;
-  href: string;
-  title?: string;
-}
-
 export type SearchItemType = "card" | "article" | "project-doc" | "quest";
 
 export interface SearchItem extends Omit<SearchDocument, "type"> {
@@ -265,17 +253,8 @@ export interface InitData {
   cardTagTree?: CardTagTree[]; // 卡片标签树（用于标签筛选）
   activeTag?: string; // 当前激活的标签（用于筛选）
   docCollections?: DocCollection[]; // 项目集合
-  contentLinkTargets?: Record<string, ContentLinkTarget>;
   search?: {
     href: string;
-  };
-  settings?: {
-    appearance?: {
-      image?: {
-        borderRadius?: ImageBorderRadiusPreset;
-        shadow?: ImageShadowPreset | boolean;
-      };
-    };
   };
   content: CardData | ArticleData | DocData | QuestData | HomeData | ListData;
   meta: PageMeta;

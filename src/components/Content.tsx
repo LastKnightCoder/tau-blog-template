@@ -1,5 +1,7 @@
 import { Component, type ReactNode } from "react";
 import { ContentRenderer, type ContentRendererProps } from "@tau/blog";
+import { renderPreviewLink, renderSiteLink } from "@blog/components/SiteLink";
+import { routeFor } from "@blog/services/data";
 
 class ContentErrorBoundary extends Component<
   { children: ReactNode },
@@ -22,11 +24,19 @@ class ContentErrorBoundary extends Component<
   }
 }
 
-export function Content(props: ContentRendererProps) {
+/** 本模板的正文：等待与错误界面，站内链接走模板路由；preview 为悬停预览里的正文，不再嵌套预览。 */
+export function Content({
+  preview = false,
+  ...props
+}: Omit<ContentRendererProps, "hrefFor" | "renderLink" | "fallback"> & {
+  preview?: boolean;
+}) {
   return (
     <ContentErrorBoundary key={props.content.dataUrl}>
       <ContentRenderer
         {...props}
+        hrefFor={routeFor}
+        renderLink={preview ? renderPreviewLink : renderSiteLink}
         fallback={
           <p
             role="status"

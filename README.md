@@ -6,7 +6,7 @@
 
 ## 构建
 
-本工程只消费一个 Tau 公共包 `@tau/blog`（固定为 `@xiongtao.xt/tau-blog@0.1.1`，通过 npm 别名使用），不依赖宿主源码。
+本工程只消费一个 Tau 公共包 `@tau/blog`（固定为 `@xiongtao.xt/tau-blog@0.2.0`，通过 npm 别名使用），不依赖宿主源码。
 
 ```sh
 pnpm install --frozen-lockfile --ignore-scripts
@@ -15,7 +15,7 @@ node node_modules/vitest/vitest.mjs run --config vitest.config.ts
 node scripts/build.mjs
 ```
 
-模板在默认扩展组合上追加自己的内容链接、网页嵌入、源码预览菜单、图片外观和媒体插槽。Tooltip、提示消息及预览容器属于模板，components/Content.tsx 只维护本模板的等待和错误界面。插件 CSS 和正文 CSS 按原文加载，作用范围由内容插件定义。
+正文完全由 ContentRenderer 渲染，模板不装配编辑器。components/Content.tsx 给它三样属于模板的东西：路由（`hrefFor`）、站内链接的悬停预览与引用编号（`renderLink`，实现在 components/SiteLink）、等待和错误界面；文章与文档页用 `onOutline` 生成目录。
 
 产物：
 
@@ -27,7 +27,7 @@ Release 中的 ZIP 由打 tag 的提交在干净目录中构建，可用上面�
 
 ## 数据与路由
 
-入口 meta 的 `__TAU_MANIFEST__` 和资源路径前缀 `__TAU_BASE__` 由宿主发布时替换。模板从清单按 key 读取数据；侧边栏目录、项目列表、卡片标签树、发布外观设置和站内链接目标都从清单读取。搜索只读取摘要索引，预览与引用答案也按 key 取数。
+入口 meta 的 `__TAU_MANIFEST__` 和资源路径前缀 `__TAU_BASE__` 由宿主发布时替换。模板从清单按 key 读取数据；侧边栏目录、项目列表和卡片标签树从清单读取。搜索只读取摘要索引，预览与引用答案也按 key 取数。
 
 公开路径为 `/articles/1`、`/cards`、`/projects/12/34`、`/quests/9`，部署在 /notes/ 时加上该前缀。这些规则由本模板定义。站内链接点击由 Router 处理，不整页刷新；直接打开深链时，静态托管找不到对应文件会返回 `404.html`，再由 Router 按地址渲染。GitHub Pages 自动使用 404.html；S3 需要把桶的错误页设为 `404.html`。深链的 HTTP 状态码是 404，不影响浏览器访问，但搜索引擎不会收录这些地址。
 

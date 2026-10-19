@@ -6,9 +6,8 @@ import { Content } from "@blog/components/Content";
 import Outline from "@blog/components/Outline";
 import { formatDate, joinPath } from "@blog/utils";
 import { DocData } from "@blog/types";
-import { extractHeaders } from "@blog/utils/editor";
+import type { OutlineHeading } from "@tau/blog";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
-import { getBlogKit } from "@blog/services/editorKit";
 
 const DOC_SIDEBAR_SCROLL_STORAGE_KEY = "blog:doc-sidebar-scroll";
 const DOC_SIDEBAR_COLLAPSE_STORAGE_KEY = "blog:doc-sidebar-collapse";
@@ -20,17 +19,10 @@ const DocPage = memo(() => {
   const { site, navigation, sidebar } = initData;
   const doc = initData.content as DocData;
   const docCollections = initData.docCollections || [];
-  const blogSettings = initData.settings;
-  const kit = getBlogKit(blogSettings);
-  const [renderedHeaders, setRenderedHeaders] =
-    useState<ReturnType<typeof extractHeaders>>();
+  const [headers, setHeaders] = useState<OutlineHeading[]>([]);
   const sidebarScrollRef = useRef<HTMLDivElement | null>(null);
   const [activeHeaderIndex, setActiveHeaderIndex] = useState(0);
 
-  const headers = useMemo(
-    () => renderedHeaders ?? extractHeaders(doc.content),
-    [doc.content, renderedHeaders],
-  );
   const activeCollectionTitle = useMemo(() => {
     for (const collection of docCollections) {
       const activeItem = collection.items.find((item) => item.active);
@@ -282,14 +274,7 @@ const DocPage = memo(() => {
                   </div>
 
                   {/* 正文 */}
-                  <Content
-                    content={content}
-                    kit={kit}
-                    initValue={doc.content}
-                    onInit={(editor, nodes) =>
-                      setRenderedHeaders(extractHeaders(nodes, editor))
-                    }
-                  />
+                  <Content content={content} onOutline={setHeaders} />
 
                   {/* 上下篇导航：简洁文本链接 */}
                   {(doc.prevPage || doc.nextPage) && (

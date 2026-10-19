@@ -21,7 +21,7 @@
     "slate-history": "0.113.1",
     "slate-react": "0.126.4",
     "react-router-dom": "6.30.6",
-    "@tau/blog": "npm:@xiongtao.xt/tau-blog@0.1.1"
+    "@tau/blog": "npm:@xiongtao.xt/tau-blog@0.2.0"
   },
   "devDependencies": {
     "postcss": "8.5.6",

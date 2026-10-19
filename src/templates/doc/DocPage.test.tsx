@@ -24,8 +24,6 @@ vi.mock("@blog/components/Common", () => ({
   ScrollToTop: () => null,
 }));
 
-vi.mock("@blog/services/editorKit", () => ({ getBlogKit: () => ({}) }));
-
 describe("DocPage", () => {
   let container: HTMLDivElement;
   let root: Root;

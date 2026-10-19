@@ -48,22 +48,6 @@ const mockDocCollections: DocCollection[] = [
   },
 ];
 
-const mockContentLinkTargets = {
-  "card:9001": {
-    key: "card:9001",
-    contentType: "card",
-    refId: 9001,
-    href: "/cards/9001",
-    title: "React 性能优化策略",
-  },
-  "project-item:9002": {
-    key: "doc:project:101:9002",
-    contentType: "project-item",
-    refId: 9002,
-    href: "/projects/101/9002",
-    title: "快速开始 - 介绍",
-  },
-};
 
 const buildDocSidebarValidationDemo = () => {
   const longVersionChildren = Array.from({ length: 18 }, (_, index) => ({
@@ -251,7 +235,6 @@ export const mockQuestPageData: InitData = {
     active: n.href === "/quests",
   })),
   docCollections: mockDocCollections,
-  contentLinkTargets: mockContentLinkTargets,
   content: {
     id: 1,
     title: "React 列表重渲染时，为什么输入框会失焦？",
@@ -557,7 +540,6 @@ export const mockDocPageSidebarDemoData: InitData = {
     ...n,
     active: n.href === "/projects",
   })),
-  contentLinkTargets: mockContentLinkTargets,
   sidebar: buildDocSidebarValidationDemo(),
   docCollections: mockDocCollections.map((collection) => ({
     ...collection,

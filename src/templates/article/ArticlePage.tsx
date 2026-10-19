@@ -8,8 +8,7 @@ import { Content } from "@blog/components/Content";
 import Outline from "@blog/components/Outline";
 import { formatDate, getReadingTime, joinPath } from "@blog/utils";
 import { ArticleData } from "@blog/types";
-import { extractHeaders } from "@blog/utils/editor";
-import { getBlogKit } from "@blog/services/editorKit";
+import type { OutlineHeading } from "@tau/blog";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 
 
@@ -19,19 +18,11 @@ const ArticlePage = memo(() => {
   const { site, navigation } = initData;
   const article = initData.content as ArticleData;
   const docCollections = initData.docCollections || [];
-  const blogSettings = initData.settings;
-  const kit = getBlogKit(blogSettings);
-  const [renderedHeaders, setRenderedHeaders] =
-    useState<ReturnType<typeof extractHeaders>>();
+  const [headers, setHeaders] = useState<OutlineHeading[]>([]);
 
   const readingTime = useMemo(
     () => getReadingTime(article.content),
     [article.content],
-  );
-
-  const headers = useMemo(
-    () => renderedHeaders ?? extractHeaders(article.content),
-    [article.content, renderedHeaders],
   );
 
   const handleHeaderClick = (index: number) => {
@@ -127,14 +118,7 @@ const ArticlePage = memo(() => {
                   </div>
 
                   {/* 正文内容 */}
-                  <Content
-                    content={content}
-                    kit={kit}
-                    initValue={article.content}
-                    onInit={(editor, nodes) =>
-                      setRenderedHeaders(extractHeaders(nodes, editor))
-                    }
-                  />
+                  <Content content={content} onOutline={setHeaders} />
 
                   {/* 标签区域（文章底部） */}
                   {article.tags && article.tags.length > 0 && (

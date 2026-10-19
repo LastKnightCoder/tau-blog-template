@@ -2,6 +2,7 @@ const dataRead = vi.hoisted(() => vi.fn());
 vi.mock("@blog/services/data", () => ({
   dataClient: () => ({ readData: dataRead }),
   adaptData: (result: any) => result.data,
+  routeFor: (target: { key: string }) => `/${target.key}`,
 }));
 import { BlogDataProvider } from "@blog/services/data-context";
 import type { InitData } from "@blog/types";
@@ -30,17 +31,13 @@ vi.mock("@blog/components/Common", () => ({
 }));
 
 vi.mock("@tau/blog", () => ({
-  ContentRenderer: ({ initValue }: { initValue: any[] }) => (
+  ContentRenderer: ({ content, nodes }: { content: any; nodes?: any[] }) => (
     <div data-testid="editor">
-      {JSON.stringify(initValue)
+      {JSON.stringify(nodes ?? content.data.content.content)
         .replace(/\\u003c/g, "<")
         .replace(/\\u003e/g, ">")}
     </div>
   ),
-}));
-
-vi.mock("@blog/services/editorKit", () => ({
-  getBlogKit: () => ({}),
 }));
 
 describe("QuestPage", () => {

@@ -106,7 +106,6 @@ it("已知内容引用、侧边栏、项目集合和标签树都保留模板链�
         ],
       },
     ],
-    contentLinkTargets: { "project-item:34": target },
   } as DataManifest);
   await initializeData("https://resources.example/releases/site.json");
   const result = adaptData({
@@ -123,11 +122,6 @@ it("已知内容引用、侧边栏、项目集合和标签树都保留模板链�
   expect(result.cardTagTree).toMatchObject([
     { children: [{ cards: [{ href }] }] },
   ]);
-  expect(result.contentLinkTargets?.["project-item:34"]).toMatchObject({
-    contentType: "project-item",
-    refId: 34,
-    href,
-  });
 });
 
 it("模板根据清单元数据定义路由，不解析 key 或数据文件路径", () => {

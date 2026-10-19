@@ -1,17 +1,16 @@
-import { act, type ComponentType } from "react";
+import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
-import type { ElementRenderProps } from "@tau/blog/editor";
+import type { LinkRenderProps } from "@tau/blog";
 import type { InitData } from "@blog/types";
 import { BlogDataProvider } from "@blog/services/data-context";
-import { blogContentLinkExtension } from "../contentLinkExtension";
+import { renderSiteLink } from ".";
 
 const load = vi.hoisted(() => vi.fn());
-vi.mock("../contentLinkPreview", async (original) => ({
-  ...(await original<typeof import("../contentLinkPreview")>()),
-  loadContentLinkPreview: load,
+vi.mock("./preview", () => ({ loadContentLinkPreview: load }));
+vi.mock("@blog/services/data", () => ({
+  routeFor: (target: { key: string }) => `/${target.key}`,
 }));
-vi.mock("@blog/services/editorKit", () => ({ getBlogKit: () => ({}) }));
 vi.mock("@blog/components/Content", () => ({
   Content: ({ content }: { content: { data: { key: string } } }) => (
     <p data-preview-key={content.data.key} />
@@ -33,6 +32,15 @@ afterEach(() => {
   load.mockReset();
 });
 
+const link = (key: string): LinkRenderProps => ({
+  identity: `article:${key}`,
+  target: { key, type: "article" },
+  href: `/${key}`,
+  title: "",
+  text: "链接",
+  children: "链接",
+});
+
 it("预览关闭或切换目标后，旧请求结果不会覆盖当前正文；缺正文时显示空态", async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   const pending: ((value: unknown) => void)[] = [];
@@ -42,47 +50,28 @@ it("预览关闭或切换目标后，旧请求结果不会覆盖当前正文；�
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
-  const Render = blogContentLinkExtension.elements![0]
-    .render as ComponentType<ElementRenderProps>;
-  const data = {
-    site: { basePath: "/" },
-    contentLinkTargets: {
-      "article:1": { key: "first", href: "/articles/1" },
-      "article:2": { key: "second", href: "/articles/2" },
-    },
-  } as unknown as InitData;
-  const render = (id: number) =>
+  const data = { site: { basePath: "/" } } as unknown as InitData;
+  const render = (key: string) =>
     act(async () =>
       root.render(
         <BlogDataProvider data={data}>
-          <Render
-            attributes={{ "data-slate-node": "element", ref: () => {} }}
-            element={
-              {
-                type: "content-link",
-                contentType: "article",
-                refId: id,
-                children: [],
-              } as unknown as ElementRenderProps["element"]
-            }
-          >
-            链接
-          </Render>
+          {renderSiteLink(link(key))}
         </BlogDataProvider>,
       ),
     );
   const preview = (key: string) => ({
     result: { data: { key }, dataUrl: key },
-    initData: { settings: {} },
+    initData: {},
   });
   try {
-    await render(1);
+    await render("first");
+    expect(container.querySelector("a")?.getAttribute("href")).toBe("/first");
     await act(async () => container.querySelectorAll("button")[0].click());
     await act(async () => container.querySelectorAll("button")[1].click());
     await act(async () => pending[0](preview("closed")));
     expect(container.querySelector("[data-preview-key]")).toBeNull();
     await act(async () => container.querySelectorAll("button")[0].click());
-    await render(2);
+    await render("second");
     expect(load.mock.calls.map((call) => call[0])).toEqual([
       "first",
       "first",
@@ -100,7 +89,6 @@ it("预览关闭或切换目标后，旧请求结果不会覆盖当前正文；�
     await act(async () => container.querySelectorAll("button")[0].click());
     await act(async () => pending[3](null));
     expect(container.textContent).toContain("暂无可预览内容");
-    expect(container.querySelector("[data-preview-key]")).toBeNull();
   } finally {
     await act(async () => root.unmount());
     container.remove();

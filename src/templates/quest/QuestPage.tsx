@@ -18,7 +18,6 @@ import {
   joinPath,
 } from "@blog/utils";
 import { QuestAnswerData, QuestData } from "@blog/types";
-import { getBlogKit } from "@blog/services/editorKit";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 import { CitationProvider, CitationScope } from "@blog/components/Citation";
 import {
@@ -45,14 +44,7 @@ type LoadedAnswerContent = {
   result?: DataResult;
 };
 const AnswerContent = memo(
-  ({
-    answer,
-    settings,
-  }: {
-    answer: QuestAnswerData;
-    settings: ReturnType<typeof useInitData>["settings"];
-  }) => {
-    const inlineKit = getBlogKit(settings);
+  ({ answer }: { answer: QuestAnswerData }) => {
     const inlineResult = useBlogContent();
     const sourceKey = answer.source?.key;
     const [remote, setRemote] = useState<LoadedAnswerContent>({
@@ -106,8 +98,7 @@ const AnswerContent = memo(
       <div>
         <Content
           content={remote.result ?? inlineResult}
-          kit={inlineKit}
-          initValue={remote.content}
+          nodes={remote.result ? undefined : remote.content}
         />
       </div>
     );
@@ -213,8 +204,6 @@ const QuestPage = memo(() => {
   const { site, navigation } = initData;
   const quest = initData.content as QuestData;
   const docCollections = initData.docCollections || [];
-  const blogSettings = initData.settings;
-  const kit = getBlogKit(blogSettings);
   const hasDescription = Boolean(
     quest.description && getPlainText(quest.description).trim(),
   );
@@ -285,8 +274,7 @@ const QuestPage = memo(() => {
                     >
                       <Content
                         content={content}
-                        kit={kit}
-                        initValue={quest.description}
+                        nodes={quest.description}
                         className="text-[var(--color-text-tertiary)]"
                       />
                     </div>
@@ -308,7 +296,6 @@ const QuestPage = memo(() => {
                           />
                           <AnswerContent
                             answer={answer}
-                            settings={blogSettings}
                           />
                         </section>
                       ))

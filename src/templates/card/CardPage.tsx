@@ -7,7 +7,6 @@ import { Tag, ScrollToTop } from "@blog/components/Common";
 import { Content } from "@blog/components/Content";
 import { formatDate, getReadingTime, joinPath } from "@blog/utils";
 import { CardData, LinkedCardInfo } from "@blog/types";
-import { getBlogKit } from "@blog/services/editorKit";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 
 function buildCardListTagHref(basePath: string, tag: string): string {
@@ -44,8 +43,6 @@ const CardPage = memo(() => {
   const { site, navigation } = initData;
   const card = initData.content as CardData;
   const docCollections = initData.docCollections || [];
-  const blogSettings = initData.settings;
-  const kit = getBlogKit(blogSettings);
 
   const readingTime = useMemo(
     () => getReadingTime(card.content),
@@ -117,7 +114,7 @@ const CardPage = memo(() => {
               </div>
 
               {/* 正文 */}
-              <Content content={content} kit={kit} initValue={card.content} />
+              <Content content={content} />
 
               {/* 更新时间 */}
               {card.updateTime !== card.createTime && (
