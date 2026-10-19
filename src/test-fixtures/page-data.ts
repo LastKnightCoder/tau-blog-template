@@ -1,4 +1,4 @@
-import type { DataResult } from "@tau/editor/renderer";
+import type { DataResult } from "@tau/blog";
 import type { InitData, DocCollection } from "@blog/types";
 import type { Descendant } from "slate";
 

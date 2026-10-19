@@ -3,20 +3,20 @@ import {
   memo,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type MouseEvent,
   type ReactNode,
 } from "react";
 import classNames from "classnames";
-import { Tooltip, toast } from "@tau/editor/ui";
+import { Tooltip } from "@blog/components/Common/Tooltip";
+import { showToast } from "@blog/components/Common/toast";
 import {
   defineElement,
   defineExtension,
   type ElementRenderProps,
-} from "@tau/editor";
+} from "@tau/blog/editor";
 import { RenderElementProps } from "slate-react";
-import { ContentRenderer } from "@tau/editor/renderer";
+import { Content } from "@blog/components/Content";
 import { getBlogKit } from "@blog/services/editorKit";
 import { joinPath } from "@blog/utils";
 import type { ContentLinkTarget } from "@blog/types";
@@ -31,7 +31,6 @@ import {
 type ContentLinkElement = {
   type: "content-link";
   refId?: number;
-  contentId?: number;
   contentType?: string;
   contentTitle?: string;
   children: unknown[];
@@ -115,9 +114,8 @@ const ContentLinkPreviewPanel = memo(
             data={state.data.initData}
             content={state.data.result}
           >
-            <ContentRenderer
+            <Content
               content={state.data.result}
-              initValue={state.data.content}
               kit={getBlogKit(state.data.initData.settings)}
               extensions={blogContentLinkPreviewExtensions}
             />
@@ -159,7 +157,6 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
   );
   const canPreview = enablePreview && !!target;
   const [open, setOpen] = useState(false);
-  const requestIdRef = useRef(0);
   const [previewState, setPreviewState] = useState<LinkPreviewState>({
     loading: false,
     data: null,
@@ -172,16 +169,15 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
     }
 
     let cancelled = false;
-    const currentRequestId = ++requestIdRef.current;
     setPreviewState((previous) => ({
       ...previous,
       loading: true,
       error: "",
     }));
 
-    loadContentLinkPreview(target!.key, displayTitle)
+    loadContentLinkPreview(target!.key)
       .then((data) => {
-        if (cancelled || requestIdRef.current !== currentRequestId) {
+        if (cancelled) {
           return;
         }
         setPreviewState({
@@ -191,7 +187,7 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
         });
       })
       .catch(() => {
-        if (cancelled || requestIdRef.current !== currentRequestId) {
+        if (cancelled) {
           return;
         }
         setPreviewState({
@@ -204,14 +200,14 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
     return () => {
       cancelled = true;
     };
-  }, [open, canPreview, displayTitle, target?.key]);
+  }, [open, canPreview, target?.key]);
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
     if (!target || !targetHref) {
-      toast.info(unresolvedMessage);
+      showToast(unresolvedMessage);
       return;
     }
 
@@ -255,7 +251,6 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
     <Tooltip
       onOpenChange={setOpen}
       placement="bottom"
-      arrow={false}
       delay={350}
       className="bg-page text-ink-1 border-line-1 shadow-card max-w-[480px] overflow-hidden rounded-lg border p-0"
       content={open ? <ContentLinkPreviewPanel state={previewState} /> : null}

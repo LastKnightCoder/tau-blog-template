@@ -1,4 +1,4 @@
-@import "@tau/editor/styles.css";
+@import "@tau/blog/styles.css";
 /* Cal Sans（标题展示字体） */
 @import "cal-sans";
 /* JetBrains Mono（等宽字体） */
@@ -6,9 +6,9 @@
 @import "@fontsource/jetbrains-mono/500.css";
 
 @import "tailwindcss";
-@import "@tau/editor/theme/scale.css";
+@import "@tau/blog/theme/scale.css";
 /* 编辑器的浮层原语来自 @tau/ui，类名经 @tau/themes 的语义映射取 --tau-* */
-@import "@tau/editor/theme/tailwind.css";
+@import "@tau/blog/theme/tailwind.css";
 @import "./legacy-palette.css";
 @import "./tau-tokens.css";
 
@@ -604,18 +604,6 @@
   }
 
   /* content-link */
-  /* 只读占位块：附件文件与白板 / 数据库数据都不随发布产出（见 editorExtensions/passiveExtensions） */
-  .blog-private-block,
-  .blog-file-attachment {
-    margin: 0.75rem 0;
-    padding: 0.75rem 1rem;
-    border: 1px dashed var(--color-border-ring-heavy);
-    border-radius: 0.75rem;
-    color: var(--color-text-secondary);
-    font-size: 0.875rem;
-    text-align: center;
-  }
-
   .blog-content-link {
     cursor: pointer;
     color: var(--color-text-primary);

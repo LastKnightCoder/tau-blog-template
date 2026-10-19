@@ -9,7 +9,8 @@ import { motion } from "motion/react";
 import { Header } from "@blog/components/Layout";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
 import { Tag, ScrollToTop } from "@blog/components/Common";
-import { ContentRenderer, type DataResult } from "@tau/editor/renderer";
+import type { DataResult } from "@tau/blog";
+import { Content } from "@blog/components/Content";
 import {
   formatDate,
   getReadingTime,
@@ -17,8 +18,7 @@ import {
   joinPath,
 } from "@blog/utils";
 import { QuestAnswerData, QuestData } from "@blog/types";
-import DndProvider from "@blog/components/DndProvider";
-import { useBlogKit } from "@blog/services/editorKit";
+import { getBlogKit } from "@blog/services/editorKit";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 import { CitationProvider, CitationScope } from "@blog/components/Citation";
 import {
@@ -52,7 +52,7 @@ const AnswerContent = memo(
     answer: QuestAnswerData;
     settings: ReturnType<typeof useInitData>["settings"];
   }) => {
-    const inlineKit = useBlogKit(settings);
+    const inlineKit = getBlogKit(settings);
     const inlineResult = useBlogContent();
     const sourceKey = answer.source?.key;
     const [remote, setRemote] = useState<LoadedAnswerContent>({
@@ -104,13 +104,11 @@ const AnswerContent = memo(
       );
     const body = (
       <div>
-        <DndProvider>
-          <ContentRenderer
-            content={remote.result ?? inlineResult}
-            kit={inlineKit}
-            initValue={remote.content}
-          />
-        </DndProvider>
+        <Content
+          content={remote.result ?? inlineResult}
+          kit={inlineKit}
+          initValue={remote.content}
+        />
       </div>
     );
     return remote.data ? (
@@ -216,7 +214,7 @@ const QuestPage = memo(() => {
   const quest = initData.content as QuestData;
   const docCollections = initData.docCollections || [];
   const blogSettings = initData.settings;
-  const kit = useBlogKit(blogSettings);
+  const kit = getBlogKit(blogSettings);
   const hasDescription = Boolean(
     quest.description && getPlainText(quest.description).trim(),
   );
@@ -285,14 +283,12 @@ const QuestPage = memo(() => {
                       className="mt-6 max-w-[68ch] text-[15px] leading-8 text-[var(--color-text-tertiary)]"
                       data-testid="quest-description"
                     >
-                      <DndProvider>
-                        <ContentRenderer
-                          content={content}
-                          kit={kit}
-                          initValue={quest.description}
-                          className="text-[var(--color-text-tertiary)]"
-                        />
-                      </DndProvider>
+                      <Content
+                        content={content}
+                        kit={kit}
+                        initValue={quest.description}
+                        className="text-[var(--color-text-tertiary)]"
+                      />
                     </div>
                   )}
                   <ResearchStats quest={quest} />

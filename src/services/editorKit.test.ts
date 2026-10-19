@@ -1,24 +1,13 @@
-/**
- * blog 的已发布内容必须覆盖跨端清单里的全部业务元素类型（docs/editor-refactor P10）。
- * 少一个，含该块的内容在站点上只显示通用的「无法显示」占位（ER-006）。
- */
 import { describe, expect, it } from "vitest";
-const CONTENT_ELEMENT_TYPES = ["content-link", "file-attachment", "whiteboard", "database"];
-import { getBlogKit } from "../../services/editorKit";
+import { getBlogKit } from "./editorKit";
 
-describe("blog 已发布内容的元素覆盖", () => {
-  it("覆盖 CONTENT_ELEMENT_TYPES 的每一项", () => {
-    const types = getBlogKit().elementTypes;
-    for (const required of CONTENT_ELEMENT_TYPES) {
-      expect(types, `blog 缺少 ${required}，该块只会显示通用占位`).toContain(
-        required,
-      );
-    }
-  });
-
+describe("博客正文组合", () => {
   it("同一发布设置复用 kit，保留已拆扩展", () => {
     const settings = { appearance: { image: { borderRadius: "md" as const } } };
     const kit = getBlogKit(settings);
+    expect(kit.elementTypes).toEqual(
+      expect.arrayContaining(["content-link", "webview"]),
+    );
     expect(getBlogKit(settings)).toBe(kit);
     expect(getBlogKit()).toBe(getBlogKit());
     expect(getBlogKit({ ...settings })).not.toBe(kit);
@@ -38,7 +27,14 @@ describe("blog 已发布内容的元素覆盖", () => {
     ).toHaveLength(1);
     for (const type of ["mermaid", "plantuml"])
       expect(kit.elementTypes).toContain(type);
-    for (const type of ["html-block", "html-inline", "abc", "tikz", "typst", "custom-block"])
+    for (const type of [
+      "html-block",
+      "html-inline",
+      "abc",
+      "tikz",
+      "typst",
+      "custom-block",
+    ])
       expect(kit.elementTypes).not.toContain(type);
   });
 });

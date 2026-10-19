@@ -1,10 +1,7 @@
-import { createClient } from "@tau/plugins/publish-client";
-import type {
-  ContentRef,
-  DataManifest,
-  DataResult,
-} from "@tau/plugins/publish-data";
-import type { InitData } from "@blog/types";
+import { createClient } from "@tau/blog";
+import type { ContentRef, DataManifest, DataResult } from "@tau/blog";
+import type { InitData, SidebarItem, CardTagTree } from "@blog/types";
+import type * as Published from "@tau/blog";
 
 let source: ReturnType<typeof createClient> | undefined;
 let manifest: DataManifest | undefined;
@@ -49,29 +46,97 @@ export function keyForRoute(path: string): string | undefined {
     ?.key;
 }
 
-function resolveTargets(value: unknown, relations = true): unknown {
-  if (Array.isArray(value))
-    return value.map((item) => resolveTargets(item, relations));
-  if (!value || typeof value !== "object") return value;
-  const result: Record<string, unknown> = {};
-  const source = value as Record<string, unknown>;
-  const isNode =
-    typeof source.text === "string" ||
-    (typeof source.type === "string" && Array.isArray(source.children));
-  for (const [key, entry] of Object.entries(value)) {
-    if (
-      relations &&
-      !isNode &&
-      key === "target" &&
-      entry &&
-      typeof entry === "object" &&
-      "key" in entry
-    ) {
-      result.href = routeFor(entry as ContentRef);
-      result.key = (entry as ContentRef).key;
-    } else result[key] = resolveTargets(entry, relations && !isNode);
+function adaptContent(data: Published.PublishedData) {
+  switch (data.meta.type) {
+    case "home": {
+      const content = data.content as Published.HomeData;
+      return {
+        ...content,
+        timeline: content.timeline.map((item) => ({
+          ...item,
+          href: routeFor(item.target),
+        })),
+      };
+    }
+    case "card": {
+      const content = data.content as Published.CardData;
+      return {
+        ...content,
+        linkedCards: content.linkedCards?.map((item) => ({
+          ...item,
+          href: routeFor(item.target),
+        })),
+      };
+    }
+    case "article":
+      return { ...data.content };
+    case "doc": {
+      const content = data.content as Published.DocData;
+      return {
+        ...content,
+        currentPath: routeFor({ key: data.key, type: "doc" }),
+        breadcrumb: content.breadcrumb.map((item) => ({
+          ...item,
+          href: item.target ? routeFor(item.target) : undefined,
+        })),
+        prevPage: content.prevPage && {
+          ...content.prevPage,
+          href: routeFor(content.prevPage.target),
+        },
+        nextPage: content.nextPage && {
+          ...content.nextPage,
+          href: routeFor(content.nextPage.target),
+        },
+      };
+    }
+    case "quest": {
+      const content = data.content as Published.QuestData;
+      return {
+        ...content,
+        href: routeFor(content.target),
+        answers: content.answers.map((answer) => ({
+          ...answer,
+          source: answer.source && {
+            ...answer.source,
+            key: answer.source.target?.key,
+            href: answer.source.target
+              ? routeFor(answer.source.target)
+              : undefined,
+          },
+        })),
+        materials: content.materials.map((item) => ({
+          ...item,
+          href: item.target ? routeFor(item.target) : undefined,
+        })),
+      };
+    }
+    case "list": {
+      const content = data.content as Published.ListData;
+      return {
+        ...content,
+        items: content.items.map((item) => ({
+          ...item,
+          href: routeFor(item.target),
+        })),
+      };
+    }
   }
-  return result;
+}
+
+function sidebarItems(items: Published.TreeItem[]): SidebarItem[] {
+  return items.map((item) => ({
+    ...item,
+    href: item.target ? routeFor(item.target) : undefined,
+    children: item.children && sidebarItems(item.children),
+  }));
+}
+
+function cardTags(items: Published.CardTagTree[]): CardTagTree[] {
+  return items.map((item) => ({
+    ...item,
+    cards: item.cards.map((card) => ({ ...card, href: routeFor(card.target) })),
+    children: item.children ? cardTags(item.children) : [],
+  }));
 }
 
 export function adaptData({ data }: DataResult): InitData {
@@ -93,12 +158,7 @@ export function adaptData({ data }: DataResult): InitData {
         : [],
     ),
   ];
-  const content = resolveTargets(data.content) as InitData["content"];
-  if (data.meta.type === "doc")
-    (content as unknown as Record<string, unknown>).currentPath = routeFor({
-      key: data.key,
-      type: "doc",
-    });
+  const content = adaptContent(data) as InitData["content"];
   const targets = Object.fromEntries(
     Object.entries(data.contentLinkTargets ?? {}).map(([identity, ref]) => [
       identity,
@@ -116,17 +176,16 @@ export function adaptData({ data }: DataResult): InitData {
     content,
     meta: data.meta,
     contentLinkTargets: targets,
-    sidebar: resolveTargets(data.tree) as InitData["sidebar"],
-    docCollections: (
-      resolveTargets(data.collections) as InitData["docCollections"]
-    )?.map((collection) => ({
+    sidebar: data.tree && sidebarItems(data.tree),
+    docCollections: data.collections?.map((collection) => ({
       ...collection,
       items: collection.items.map((item) => ({
         ...item,
+        href: routeFor(item.target),
         active: data.meta.type === "doc" && item.id === projectId,
       })),
     })),
-    cardTagTree: resolveTargets(data.cardTagTree) as InitData["cardTagTree"],
+    cardTagTree: data.cardTagTree && cardTags(data.cardTagTree),
     search: { href: new URL(source.search.data, manifestResourceUrl).href },
     settings: data.settings as InitData["settings"],
   };

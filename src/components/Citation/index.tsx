@@ -15,7 +15,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import { Tooltip } from "@tau/editor/ui";
+import { Tooltip } from "@blog/components/Common/Tooltip";
 import { joinPath } from "@blog/utils";
 import type { QuestMaterialData, QuestMaterialKind } from "@blog/types";
 
@@ -258,7 +258,6 @@ export const CiteMark = memo(({ index }: { index: number }) => {
   return (
     <Tooltip
       placement="bottom"
-      arrow={false}
       delay={250}
       className="bg-page text-ink-1 border-line-1 shadow-card overflow-hidden rounded-lg border p-0"
       content={

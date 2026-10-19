@@ -4,11 +4,10 @@ import { motion } from "motion/react";
 import { Header } from "@blog/components/Layout";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
 import { Tag, ScrollToTop } from "@blog/components/Common";
-import { ContentRenderer } from "@tau/editor/renderer";
+import { Content } from "@blog/components/Content";
 import { formatDate, getReadingTime, joinPath } from "@blog/utils";
 import { CardData, LinkedCardInfo } from "@blog/types";
-import DndProvider from "@blog/components/DndProvider";
-import { useBlogKit } from "@blog/services/editorKit";
+import { getBlogKit } from "@blog/services/editorKit";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 
 function buildCardListTagHref(basePath: string, tag: string): string {
@@ -46,7 +45,7 @@ const CardPage = memo(() => {
   const card = initData.content as CardData;
   const docCollections = initData.docCollections || [];
   const blogSettings = initData.settings;
-  const kit = useBlogKit(blogSettings);
+  const kit = getBlogKit(blogSettings);
 
   const readingTime = useMemo(
     () => getReadingTime(card.content),
@@ -118,13 +117,7 @@ const CardPage = memo(() => {
               </div>
 
               {/* 正文 */}
-              <DndProvider>
-                <ContentRenderer
-                  content={content}
-                  kit={kit}
-                  initValue={card.content}
-                />
-              </DndProvider>
+              <Content content={content} kit={kit} initValue={card.content} />
 
               {/* 更新时间 */}
               {card.updateTime !== card.createTime && (

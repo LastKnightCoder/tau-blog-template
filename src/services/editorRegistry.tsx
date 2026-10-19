@@ -1,20 +1,16 @@
-import { IFileService, IResourceService } from "@tau/editor/host-services";
-import { forwardRef } from "react";
-import type { ImgHTMLAttributes } from "react";
-import type { ServiceRegistration } from "@tau/editor";
+import type { ServiceRegistration } from "@tau/blog/editor";
 import {
   IEditorSlots,
   IVideoContentProviders,
-  type EditorSlots,
-  type VideoSlotProps,
-  type AudioSlotProps,
-} from "@tau/editor/extensions/media/services";
+  createDefaultEditorSlots,
+  AudioPlayer,
+  VideoPlayer,
+} from "@tau/blog/media";
 import {
   type ImageBorderRadiusPreset,
   type ImageShadowPreset,
-} from "@tau/editor/extensions/media/types";
-import { type ImageAppearanceConfig } from "@tau/editor/extensions/media";
-import { AudioPlayer, VideoPlayer } from "@tau/editor/extensions/media/players";
+} from "@tau/blog/media";
+import { type ImageAppearanceConfig } from "@tau/blog/media";
 import { blogVideoContentProviders } from "../editor-providers/videoProviders";
 
 export interface BlogPublishSettings {
@@ -41,82 +37,12 @@ function getBlogImageSettingValue<T extends "borderRadius" | "shadow">(
   >[T];
 }
 
-const createBlogEditorSlots = (): EditorSlots => {
-  const Image = forwardRef<
-    HTMLImageElement,
-    ImgHTMLAttributes<HTMLImageElement> & {
-      url: string;
-      alt?: string;
-      onLoadError?: () => void;
-    }
-  >(
-    (
-      {
-        url,
-        alt,
-        className,
-        style,
-        onClick,
-        onDoubleClick,
-        onLoad,
-        onLoadError,
-        crossOrigin,
-        draggable,
-      },
-      ref,
-    ) => (
-      <img
-        ref={ref}
-        src={url}
-        alt={alt || url}
-        className={className}
-        style={style}
-        onClick={onClick}
-        onDoubleClick={onDoubleClick}
-        onLoad={onLoad}
-        onError={onLoadError}
-        crossOrigin={crossOrigin}
-        draggable={draggable}
-      />
-    ),
-  );
-  Image.displayName = "BlogImage";
-
-  return {
-    Image,
-    Video: ({ src, ...rest }: VideoSlotProps) => (
-      <VideoPlayer src={src} {...rest} />
-    ),
-    Audio: ({ src, ...rest }: AudioSlotProps) => (
-      <AudioPlayer src={src} {...rest} />
-    ),
-  };
-};
-
-/** Blog 的服务注册项：kit 与 registry 共用同一份 */
 export const blogEditorServices: ServiceRegistration = (register) => {
-  register(IResourceService, {
-    upload: async () => {
-      throw new Error("Blog 模式不支持上传资源");
-    },
+  register(IEditorSlots, {
+    ...createDefaultEditorSlots(),
+    Video: VideoPlayer,
+    Audio: AudioPlayer,
   });
-
-  register(IFileService, {
-    select: async () => {
-      throw new Error("Blog 模式不支持文件选择");
-    },
-    readText: async () => {
-      throw new Error("Blog 模式不支持文件读取");
-    },
-    getBaseName: (filePath: string) => {
-      const normalized = filePath.replace(/\\/g, "/");
-      const parts = normalized.split("/");
-      return parts.at(-1) ?? "";
-    },
-    getHomeDir: async () => "",
-  });
-
-  register(IEditorSlots, createBlogEditorSlots());
   register(IVideoContentProviders, blogVideoContentProviders);
 };
 

@@ -1,6 +1,5 @@
 import { BlogDataProvider } from "@blog/services/data-context";
 import { act } from "react";
-import type { ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -10,7 +9,7 @@ import {
   publishedResult,
 } from "@blog/test-fixtures/page-data";
 
-vi.mock("@tau/editor/renderer", () => ({
+vi.mock("@tau/blog", () => ({
   ContentRenderer: () => <div data-slate-editor="true" />,
 }));
 
@@ -25,11 +24,7 @@ vi.mock("@blog/components/Common", () => ({
   ScrollToTop: () => null,
 }));
 
-vi.mock("@blog/components/DndProvider", () => ({
-  default: ({ children }: { children: ReactNode }) => <>{children}</>,
-}));
-
-vi.mock("@blog/services/editorKit", () => ({ useBlogKit: () => ({}) }));
+vi.mock("@blog/services/editorKit", () => ({ getBlogKit: () => ({}) }));
 
 describe("DocPage", () => {
   let container: HTMLDivElement;

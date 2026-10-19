@@ -1,9 +1,9 @@
 import { Descendant } from "slate";
-import type { SearchDocument } from "@tau/plugins/publish-data";
+import type { SearchDocument } from "@tau/blog";
 import {
   type ImageBorderRadiusPreset,
   type ImageShadowPreset,
-} from "@tau/editor/extensions/media/types";
+} from "@tau/blog/media";
 
 // 站点配置
 export interface SiteConfig {
@@ -71,8 +71,6 @@ export interface CardData {
   updateTime: number;
   // 关联卡片（通过链接）
   linkedCards?: LinkedCardInfo[];
-  // 相同标签的卡片
-  relatedCards?: LinkedCardInfo[];
 }
 
 // 文章数据
@@ -264,8 +262,6 @@ export interface InitData {
   site: SiteConfig;
   navigation: NavItem[];
   sidebar?: SidebarItem[];
-  articleList?: ArticleListItem[]; // 文章列表（用于博客模式侧边栏）
-  cardList?: CardListItem[]; // 卡片列表（用于卡片页面左侧导航）
   cardTagTree?: CardTagTree[]; // 卡片标签树（用于标签筛选）
   activeTag?: string; // 当前激活的标签（用于筛选）
   docCollections?: DocCollection[]; // 项目集合

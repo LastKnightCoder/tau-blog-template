@@ -1,7 +1,7 @@
 import Fuse, { type FuseResult, type IFuseOptions } from "fuse.js";
 import type { SearchItem } from "@blog/types";
 import { dataManifest, routeFor } from "@blog/services/data";
-import type { SearchFile } from "@tau/plugins/publish-data";
+import type { SearchFile } from "@tau/blog";
 export const SEARCH_RECENT_QUERIES_KEY = "blog:search:recent-queries";
 export const SEARCH_RECENT_QUERIES_LIMIT = 5;
 export const SEARCH_RESULT_LIMIT = 12;

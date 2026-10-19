@@ -6,7 +6,10 @@ import {
 const read = vi.hoisted(() => vi.fn());
 vi.mock("@blog/services/data", () => ({
   dataClient: () => ({ readData: read }),
-  adaptData: (result: any) => JSON.parse(JSON.stringify(result.data)),
+  adaptData: (result: any) => ({
+    ...result.data,
+    content: { ...result.data.content },
+  }),
 }));
 beforeEach(() => read.mockReset());
 it("正文身份映射到数据 key，公开路径由模板自行生成", () => {
@@ -35,13 +38,12 @@ it("按 key 读取，数据缓存留给数据层，每个预览独立装配渲�
     dataUrl: "https://data.example/data/articles/12.hash.json",
   });
   const [first, second] = await Promise.all([
-    loadContentLinkPreview("article:12", "标题"),
-    loadContentLinkPreview("article:12", "标题"),
+    loadContentLinkPreview("article:12"),
+    loadContentLinkPreview("article:12"),
   ]);
   expect(read).toHaveBeenCalledWith({ key: "article:12" });
-  expect(first.content).not.toBe(second.content);
-  expect(first.initData).not.toBe(second.initData);
-  expect(first.result.dataUrl).toBe(
+  expect(first!.initData).not.toBe(second!.initData);
+  expect(first!.result.dataUrl).toBe(
     "https://data.example/data/articles/12.hash.json",
   );
 });
@@ -53,8 +55,17 @@ it("失败不缓存，下一次可重试", async () => {
     },
     dataUrl: "https://data.example/card.json",
   });
-  await expect(loadContentLinkPreview("card:1", "卡片")).rejects.toThrow(
-    "数据不可用",
-  );
-  expect((await loadContentLinkPreview("card:1", "卡片")).title).toBe("卡片");
+  await expect(loadContentLinkPreview("card:1")).rejects.toThrow("数据不可用");
+  expect(
+    (await loadContentLinkPreview("card:1"))!.result.data.content,
+  ).toMatchObject({ content: [{ text: "恢复" }] });
+});
+
+it.each([
+  { title: "没有正文" },
+  { content: [] },
+  { description: [{ text: "不假定其他字段就是正文" }] },
+])("没有可预览正文时返回空态，不制造空段落：%j", async (content) => {
+  read.mockResolvedValue({ data: { content } });
+  expect(await loadContentLinkPreview("empty")).toBeNull();
 });

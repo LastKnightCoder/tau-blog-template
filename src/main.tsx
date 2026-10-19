@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter, useLocation } from "react-router-dom";
-import { UiProvider } from "@tau/editor/ui";
 import { BlogDataProvider } from "./services/data-context";
 import {
   adaptData,
@@ -9,7 +8,7 @@ import {
   initializeData,
   keyForRoute,
 } from "./services/data";
-import type { DataResult } from "@tau/editor/renderer";
+import type { DataResult } from "@tau/blog";
 import { initTheme } from "./utils";
 import type { InitData } from "./types";
 import HomePage from "./templates/home/HomePage";
@@ -105,11 +104,9 @@ async function start() {
   }
   initTheme();
   createRoot(document.getElementById("root")!).render(
-    <UiProvider>
-      <HashRouter>
-        <BlogRouter />
-      </HashRouter>
-    </UiProvider>,
+    <HashRouter>
+      <BlogRouter />
+    </HashRouter>,
   );
 }
 void start().catch((error) => {

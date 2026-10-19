@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createRequire } from "node:module";
 import postcss from "postcss";
 
-const editorCss = readFileSync(createRequire(import.meta.url).resolve("@tau/editor/styles.css"), "utf8");
+const editorCss = readFileSync(createRequire(import.meta.url).resolve("@tau/blog/styles.css"), "utf8");
 const requiredTokens = [...new Set(editorCss.match(/--tau-[\w-]+(?=\s*:)/g))];
 function collectCssVars(css: string) {
   const blocks = new Map<string, Record<string, string>>();

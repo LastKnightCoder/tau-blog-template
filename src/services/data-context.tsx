@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 import type { InitData } from "@blog/types";
-import type { DataResult } from "@tau/editor/renderer";
+import type { DataResult } from "@tau/blog";
 
 const BlogDataContext = createContext<InitData | null>(null);
 const BlogContentContext = createContext<DataResult | undefined>(undefined);

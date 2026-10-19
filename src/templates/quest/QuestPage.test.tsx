@@ -6,7 +6,6 @@ vi.mock("@blog/services/data", () => ({
 import { BlogDataProvider } from "@blog/services/data-context";
 import type { InitData } from "@blog/types";
 import { act } from "react";
-import type { ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -30,7 +29,7 @@ vi.mock("@blog/components/Common", () => ({
   ScrollToTop: () => null,
 }));
 
-vi.mock("@tau/editor/renderer", () => ({
+vi.mock("@tau/blog", () => ({
   ContentRenderer: ({ initValue }: { initValue: any[] }) => (
     <div data-testid="editor">
       {JSON.stringify(initValue)
@@ -40,13 +39,8 @@ vi.mock("@tau/editor/renderer", () => ({
   ),
 }));
 
-vi.mock("@blog/components/DndProvider", () => ({
-  default: ({ children }: { children: ReactNode }) => <>{children}</>,
-}));
-
 vi.mock("@blog/services/editorKit", () => ({
   getBlogKit: () => ({}),
-  useBlogKit: () => ({}),
 }));
 
 describe("QuestPage", () => {

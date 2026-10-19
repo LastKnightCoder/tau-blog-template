@@ -11,6 +11,7 @@ import { build } from "vite";
 import AdmZip from "adm-zip";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const { version } = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 await build({ root, configFile: path.join(root, "vite.config.ts") });
 const site = path.join(root, "dist/site");
 const integrity = {};
@@ -34,7 +35,7 @@ const manifest = {
   platform: "desktop",
   id: "tau.blog",
   name: "Tau 博客",
-  version: "1.0.0",
+  version,
   minAppVersion: "0.59.0",
   description:
     "保留 Tau 博客的文章、卡片、项目、求索录、搜索与内容预览的独立模板。",
@@ -53,7 +54,7 @@ const zip = new AdmZip();
 zip.addLocalFolder(path.join(root, "dist"), "tau.blog");
 await mkdir(path.join(root, "output"), { recursive: true });
 const bytes = zip.toBuffer();
-await writeFile(path.join(root, "output/tau.blog-1.0.0.zip"), bytes);
+await writeFile(path.join(root, "output", `${manifest.id}-${version}.zip`), bytes);
 console.log(
   JSON.stringify({
     id: manifest.id,

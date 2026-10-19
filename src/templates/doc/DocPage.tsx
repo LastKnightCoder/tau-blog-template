@@ -2,16 +2,15 @@ import { useInitData, useBlogContent } from "@blog/services/data-context";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Header, DocSidebar } from "@blog/components/Layout";
 import { Breadcrumb, ScrollToTop } from "@blog/components/Common";
-import { ContentRenderer } from "@tau/editor/renderer";
+import { Content } from "@blog/components/Content";
 import Outline from "@blog/components/Outline";
 import { formatDate, joinPath } from "@blog/utils";
 import { DocData } from "@blog/types";
-import { HeaderElement } from "@tau/editor/extensions/header";
+import type { HeaderElement } from "@tau/blog/editor";
 import type { Editor as SlateEditor } from "slate";
 import { getInlineElementText } from "@blog/utils/editor";
-import DndProvider from "@blog/components/DndProvider";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
-import { useBlogKit } from "@blog/services/editorKit";
+import { getBlogKit } from "@blog/services/editorKit";
 
 const DOC_SIDEBAR_SCROLL_STORAGE_KEY = "blog:doc-sidebar-scroll";
 const DOC_SIDEBAR_COLLAPSE_STORAGE_KEY = "blog:doc-sidebar-collapse";
@@ -42,7 +41,7 @@ const DocPage = memo(() => {
   const doc = initData.content as DocData;
   const docCollections = initData.docCollections || [];
   const blogSettings = initData.settings;
-  const kit = useBlogKit(blogSettings);
+  const kit = getBlogKit(blogSettings);
   const [renderedHeaders, setRenderedHeaders] =
     useState<ReturnType<typeof extractHeaders>>();
   const sidebarScrollRef = useRef<HTMLDivElement | null>(null);
@@ -303,16 +302,14 @@ const DocPage = memo(() => {
                   </div>
 
                   {/* 正文 */}
-                  <DndProvider>
-                    <ContentRenderer
-                      content={content}
-                      kit={kit}
-                      initValue={doc.content}
-                      onInit={(editor, nodes) =>
-                        setRenderedHeaders(extractHeaders(nodes, editor))
-                      }
-                    />
-                  </DndProvider>
+                  <Content
+                    content={content}
+                    kit={kit}
+                    initValue={doc.content}
+                    onInit={(editor, nodes) =>
+                      setRenderedHeaders(extractHeaders(nodes, editor))
+                    }
+                  />
 
                   {/* 上下篇导航：简洁文本链接 */}
                   {(doc.prevPage || doc.nextPage) && (

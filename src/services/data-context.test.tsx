@@ -1,7 +1,7 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, it } from "vitest";
-import type { DataResult } from "@tau/editor/renderer";
+import type { DataResult } from "@tau/blog";
 import type { InitData } from "@blog/types";
 import { BlogDataProvider, useInitData, useBlogContent } from "./data-context";
 

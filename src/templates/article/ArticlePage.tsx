@@ -5,14 +5,13 @@ import { motion } from "motion/react";
 import { Header } from "@blog/components/Layout";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
 import { Tag, ScrollToTop } from "@blog/components/Common";
-import { ContentRenderer } from "@tau/editor/renderer";
+import { Content } from "@blog/components/Content";
 import Outline from "@blog/components/Outline";
 import { formatDate, getReadingTime, joinPath } from "@blog/utils";
 import { ArticleData } from "@blog/types";
-import { HeaderElement } from "@tau/editor/extensions/header";
+import type { HeaderElement } from "@tau/blog/editor";
 import { getInlineElementText } from "@blog/utils/editor";
-import DndProvider from "@blog/components/DndProvider";
-import { useBlogKit } from "@blog/services/editorKit";
+import { getBlogKit } from "@blog/services/editorKit";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 
 function extractHeaders(content: unknown[], editor?: SlateEditor) {
@@ -41,7 +40,7 @@ const ArticlePage = memo(() => {
   const article = initData.content as ArticleData;
   const docCollections = initData.docCollections || [];
   const blogSettings = initData.settings;
-  const kit = useBlogKit(blogSettings);
+  const kit = getBlogKit(blogSettings);
   const [renderedHeaders, setRenderedHeaders] =
     useState<ReturnType<typeof extractHeaders>>();
 
@@ -148,16 +147,14 @@ const ArticlePage = memo(() => {
                   </div>
 
                   {/* 正文内容 */}
-                  <DndProvider>
-                    <ContentRenderer
-                      content={content}
-                      kit={kit}
-                      initValue={article.content}
-                      onInit={(editor, nodes) =>
-                        setRenderedHeaders(extractHeaders(nodes, editor))
-                      }
-                    />
-                  </DndProvider>
+                  <Content
+                    content={content}
+                    kit={kit}
+                    initValue={article.content}
+                    onInit={(editor, nodes) =>
+                      setRenderedHeaders(extractHeaders(nodes, editor))
+                    }
+                  />
 
                   {/* 标签区域（文章底部） */}
                   {article.tags && article.tags.length > 0 && (
