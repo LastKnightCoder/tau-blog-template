@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@tau/blog':
-        specifier: npm:@xiongtao.xt/tau-blog@0.1.0
-        version: '@xiongtao.xt/tau-blog@0.1.0(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/react@19.2.0)(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate-history@0.113.1(slate@0.126.2))(slate-react@0.126.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate@0.126.2))(slate@0.126.2)'
+        specifier: npm:@xiongtao.xt/tau-blog@0.2.0
+        version: '@xiongtao.xt/tau-blog@0.2.0(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/react@19.2.0)(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate-history@0.113.1(slate@0.126.2))(slate-react@0.126.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate@0.126.2))(slate@0.126.2)'
       classnames:
         specifier: 2.5.1
         version: 2.5.1
@@ -75,9 +75,6 @@ importers:
       jsdom:
         specifier: 25.0.1
         version: 25.0.1
-      mime-types:
-        specifier: 3.0.2
-        version: 3.0.2
       postcss:
         specifier: 8.5.6
         version: 8.5.6
@@ -690,8 +687,8 @@ packages:
   '@vitest/utils@3.2.7':
     resolution: {integrity: sha512-x6BDOd7dyo3PFLY3I9/HJ25X/6OurhGXk2/B9gOZNPF7XDVjeBK4k01lQE5uvDpbuheErh91qYuE1E2OEjK3Rw==}
 
-  '@xiongtao.xt/tau-blog@0.1.0':
-    resolution: {integrity: sha512-P+YNGd5SIxblD+mURQdI4P8NZYv2vbC0rLiZl6VPIeg+Jw0txzxcN9AhLZ0Kt1sTVSGr2bGwCgcius6Vcs4YBA==}
+  '@xiongtao.xt/tau-blog@0.2.0':
+    resolution: {integrity: sha512-gbYouBYNOh2yhcPkgmeqRWhPLbRomI5pI3vmyMC+zVQB9Gu6J/8HZP+Mzz1k0HuvbBYPls8OST22BefvxCHJxw==}
     peerDependencies:
       react: ^19.2.0
       react-dnd: ^16.0.1
@@ -1054,17 +1051,9 @@ packages:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
 
-  mime-db@1.54.0:
-    resolution: {integrity: sha512-aU5EJuIN2WDemCcAp2vFBfp/m4EAhWJnUNSSw0ixs7/kXbd6Pg64EmwJkNdFhB8aWt1sH2CTXrLxo/iAGV3oPQ==}
-    engines: {node: '>= 0.6'}
-
   mime-types@2.1.35:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
-
-  mime-types@3.0.2:
-    resolution: {integrity: sha512-Lbgzdk0h4juoQ9fCKXW4by0UJqj+nOOrI9MJ1sSj4nI8aI2eo1qmvQEie4VD1glsS250n15LsWsYtCugiStS5A==}
-    engines: {node: '>=18'}
 
   motion-dom@12.43.0:
     resolution: {integrity: sha512-azKON4d9S65PEoFUiQTMTgPheEmzf2QngdRc50AKfJp9Q9mmcBVw22c8eMq9k8kxOFHdL7+WZY7N/5F/lwiDag==}
@@ -1803,7 +1792,7 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 2.0.0
 
-  '@xiongtao.xt/tau-blog@0.1.0(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/react@19.2.0)(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate-history@0.113.1(slate@0.126.2))(slate-react@0.126.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate@0.126.2))(slate@0.126.2)':
+  '@xiongtao.xt/tau-blog@0.2.0(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/react@19.2.0)(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate-history@0.113.1(slate@0.126.2))(slate-react@0.126.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate@0.126.2))(slate@0.126.2)':
     dependencies:
       '@types/react': 19.2.0
       '@types/react-dom': 19.2.0(@types/react@19.2.0)
@@ -2146,15 +2135,9 @@ snapshots:
 
   mime-db@1.52.0: {}
 
-  mime-db@1.54.0: {}
-
   mime-types@2.1.35:
     dependencies:
       mime-db: 1.52.0
-
-  mime-types@3.0.2:
-    dependencies:
-      mime-db: 1.54.0
 
   motion-dom@12.43.0:
     dependencies:
