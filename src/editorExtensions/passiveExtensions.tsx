@@ -13,10 +13,9 @@ import {
   defineExtension,
   type ElementRenderProps,
 } from "@tau/editor";
-import {
-  privateBlockPlaceholderText,
-  type ContentElementType,
-} from "@tau/shared";
+type ContentElementType = "whiteboard" | "database";
+const privateBlockPlaceholderText = (type: ContentElementType) =>
+  type === "whiteboard" ? "白板内容请在桌面端查看" : "数据库内容请在桌面端查看";
 
 const createPrivateBlockExtension = (type: ContentElementType) =>
   defineExtension({

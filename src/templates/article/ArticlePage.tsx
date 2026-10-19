@@ -8,7 +8,7 @@ import { Editor } from "@tau/editor";
 import Outline from "@blog/components/Outline";
 import { formatDate, getReadingTime, joinPath } from "@blog/utils";
 import { ArticleData } from "@blog/types";
-import { HeaderElement } from "@tau/editor-header";
+import { HeaderElement } from "@tau/editor/extensions/header";
 import { getInlineElementText } from "@blog/utils/editor";
 import DndProvider from "@blog/components/DndProvider";
 import { useBlogKit } from "@blog/services/editorKit";

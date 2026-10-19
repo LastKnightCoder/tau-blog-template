@@ -1,8 +1,8 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { webcrypto, createHash } from "node:crypto";
 import { loadPublishedPluginDefinitions } from "./plugin-runtime";
-import { validatePluginManifest } from "@tau/plugins/package";
-import type { PublishedPluginRender } from "@tau/plugins/rendering";
+import { validatePluginManifest } from "@tau/plugins/publish-artifacts";
+import type { PublishedPluginRender } from "@tau/plugins/publish-artifacts";
 const code = `module.exports.default=require('@tau/plugins').definePlugin({id:'test.editor',name:'test',version:'1.0.0',editorExtensions:[{id:'test.node',apiVersion:1,elements:[{type:'test.node',kind:'block',render:()=>null}]}],create(){throw Error('博客不能调用 create')}});`;
 const hash = (value: string) =>
   createHash("sha256").update(value).digest("hex");
@@ -30,7 +30,7 @@ beforeEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   document.head
-    .querySelectorAll("style[data-tau-editor-plugin]")
+    .querySelectorAll("style[data-tau-content-plugin]")
     .forEach((style) => style.remove());
   vi.stubGlobal("crypto", webcrypto);
   vi.stubGlobal(
@@ -46,11 +46,11 @@ it("按清单验证并加载同一个入口及样式，不执行桌面生命周�
   const loaded = await loadPublishedPluginDefinitions([dependency], dataUrl);
   expect(loaded.definitions[0].id).toBe("test.editor");
   expect(
-    document.head.querySelector("style[data-tau-editor-plugin]")?.textContent,
-  ).toBe(".test{}");
+    document.head.querySelector("style[data-tau-content-plugin]")?.textContent,
+  ).toContain(".test{}");
   loaded.dispose();
   expect(
-    document.head.querySelector("style[data-tau-editor-plugin]"),
+    document.head.querySelector("style[data-tau-content-plugin]"),
   ).toBeNull();
 });
 it("摘要不匹配或未来协议拒绝加载，不留下已加载贡献", async () => {
@@ -78,7 +78,7 @@ it("摘要不匹配或未来协议拒绝加载，不留下已加载贡献", asyn
     ),
   ).rejects.toThrow("协议");
   expect(
-    document.head.querySelector("style[data-tau-editor-plugin]"),
+    document.head.querySelector("style[data-tau-content-plugin]"),
   ).toBeNull();
 });
 it("重复节点/插件清单失败时回收本次注入的样式", async () => {
@@ -86,7 +86,7 @@ it("重复节点/插件清单失败时回收本次注入的样式", async () => 
     loadPublishedPluginDefinitions([dependency, dependency], dataUrl),
   ).rejects.toThrow("重复");
   expect(
-    document.head.querySelector("style[data-tau-editor-plugin]"),
+    document.head.querySelector("style[data-tau-content-plugin]"),
   ).toBeNull();
 });
 
@@ -105,14 +105,14 @@ it("同一插件的多个实例按各自数据 URL 解析资源，关闭互不�
       ),
   ).toBe(true);
   expect(
-    document.head.querySelectorAll("style[data-tau-editor-plugin]"),
+    document.head.querySelectorAll("style[data-tau-content-plugin]"),
   ).toHaveLength(2);
   preview.dispose();
   expect(
-    document.head.querySelectorAll("style[data-tau-editor-plugin]"),
+    document.head.querySelectorAll("style[data-tau-content-plugin]"),
   ).toHaveLength(1);
   page.dispose();
   expect(
-    document.head.querySelector("style[data-tau-editor-plugin]"),
+    document.head.querySelector("style[data-tau-content-plugin]"),
   ).toBeNull();
 });

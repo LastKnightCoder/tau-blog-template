@@ -2,17 +2,17 @@
  * Blog 的 EditorKit：图片外观来自发布设置，所以按设置快照建一个（同一快照复用同一个 kit）。
  */
 import { createEditorKit, type EditorKit } from "@tau/editor";
-import { createImageExtensions } from "@tau/editor-media";
+import { createImageExtensions } from "@tau/editor/extensions/media";
 import { standardExtensions } from "../editorExtensions/standard";
 import { useMemo } from "react";
 import { useBlogPlugins } from "./data-context";
-import { diagramExtensions } from "@tau/editor-diagram";
-import { htmlExtensions } from "@tau/editor-html";
-import { previewMenuExtension } from "@tau/editor-source-view/menu";
-import codeBlockExtension from "@tau/editor-code-block";
-import { mathExtensions } from "@tau/editor-math";
-import emojiExtension from "@tau/editor-emoji";
+import { diagramExtensions } from "@tau/editor/extensions/diagram";
+import { previewMenuExtension } from "@tau/editor/source-view/menu";
+import codeBlockExtension from "@tau/editor/extensions/code-block";
+import { mathExtensions } from "@tau/editor/extensions/math";
+import emojiExtension from "@tau/editor/extensions/emoji";
 import { blogEditorExtensions } from "../editorExtensions";
+import { adaptPublishedExtensions } from "../published/PublishedContent";
 import {
   blogEditorServices,
   getBlogImageAppearance,
@@ -45,7 +45,6 @@ export function getBlogKit(
       extensions: [
         ...standardExtensions,
         ...diagramExtensions,
-        ...htmlExtensions,
         previewMenuExtension,
         codeBlockExtension,
         ...mathExtensions,
@@ -62,6 +61,6 @@ export function getBlogKit(
     cache.set(snapshot, kit);
   }
   return contributions.length
-    ? kit.extend({ extensions: contributions, override: true })
+    ? kit.extend({ extensions: adaptPublishedExtensions(contributions), override: true })
     : kit;
 }

@@ -3,7 +3,7 @@
  * 少一个，含该块的内容在站点上只显示通用的「无法显示」占位（ER-006）。
  */
 import { describe, expect, it } from "vitest";
-import { CONTENT_ELEMENT_TYPES } from "@tau/shared";
+const CONTENT_ELEMENT_TYPES = ["content-link", "file-attachment", "whiteboard", "database"];
 import { getBlogKit } from "../../services/editorKit";
 
 describe("blog 已发布内容的元素覆盖", () => {
@@ -36,7 +36,9 @@ describe("blog 已发布内容的元素覆盖", () => {
     expect(
       kit.extensions.filter((extension) => extension.id === "tau.preview-menu"),
     ).toHaveLength(1);
-    for (const type of ["mermaid", "plantuml", "abc", "tikz", "typst"])
+    for (const type of ["mermaid", "plantuml"])
       expect(kit.elementTypes).toContain(type);
+    for (const type of ["html-block", "html-inline", "abc", "tikz", "typst", "custom-block"])
+      expect(kit.elementTypes).not.toContain(type);
   });
 });

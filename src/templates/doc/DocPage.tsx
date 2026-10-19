@@ -6,7 +6,7 @@ import { Editor } from "@tau/editor";
 import Outline from "@blog/components/Outline";
 import { formatDate, joinPath } from "@blog/utils";
 import { DocData } from "@blog/types";
-import { HeaderElement } from "@tau/editor-header";
+import { HeaderElement } from "@tau/editor/extensions/header";
 import { getInlineElementText } from "@blog/utils/editor";
 import DndProvider from "@blog/components/DndProvider";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";

@@ -15,7 +15,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import { Tooltip } from "@tau/ui";
+import { Tooltip } from "@tau/editor/ui";
 import { joinPath } from "@blog/utils";
 import type { QuestMaterialData, QuestMaterialKind } from "@blog/types";
 

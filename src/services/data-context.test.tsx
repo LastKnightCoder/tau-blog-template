@@ -1,7 +1,7 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, it } from "vitest";
-import type { PluginDefinition } from "@tau/plugins";
+import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
 import type { InitData } from "@blog/types";
 import { BlogDataProvider, useInitData } from "./data-context";
 import { useBlogKit } from "./editorKit";

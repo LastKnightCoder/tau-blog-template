@@ -3,7 +3,7 @@ import type { SearchDocument } from "@tau/plugins/publish-data";
 import {
   type ImageBorderRadiusPreset,
   type ImageShadowPreset,
-} from "@tau/editor-media/types";
+} from "@tau/editor/extensions/media/types";
 
 // 站点配置
 export interface SiteConfig {
@@ -262,7 +262,7 @@ export interface PageMeta {
 // 初始化数据结构
 export interface InitData {
   contentStyleText?: string;
-  pluginRenderers?: import("@tau/plugins/rendering").PublishedPluginRender[];
+  pluginRenderers?: import("@tau/plugins/publish-artifacts").PublishedPluginRender[];
   site: SiteConfig;
   navigation: NavItem[];
   sidebar?: SidebarItem[];

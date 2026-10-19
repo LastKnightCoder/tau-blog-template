@@ -1,8 +1,7 @@
 import { type AnyExtension } from "@tau/editor";
-import { createImageExtensions } from "@tau/editor-media";
-import webviewExtension from "@tau/editor-webview";
+import { createImageExtensions } from "@tau/editor/extensions/media";
+import webviewExtension from "@tau/editor/extensions/webview";
 import { blogContentLinkExtension } from "./contentLinkExtension";
-import { blogHtmlDocumentExtension } from "./htmlDocumentExtension";
 import {
   blogDatabaseExtension,
   blogFileAttachmentExtension,
@@ -15,7 +14,6 @@ import {
 
 /** content 正文在 blog 上要覆盖的业务元素（清单见 @tau/shared 的 CONTENT_ELEMENT_TYPES） */
 export const blogEditorExtensions: AnyExtension[] = [
-  blogHtmlDocumentExtension,
   blogContentLinkExtension,
   webviewExtension,
   blogFileAttachmentExtension,

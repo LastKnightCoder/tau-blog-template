@@ -6,9 +6,9 @@
 
 ## 构建
 
-当前公共渲染库尚未全部作为可独立执行的 npm 包分发，因此本工程构建时使用指定宿主 checkout 的公共 packages / editor-extensions 源码，打包后是完整独立静态站点。没有 apps/desktop 业务源码导入；不能把当前 npm SDK 的类型占位入口当作浏览器运行时。
+本工程只消费两个 Tau 公开依赖：通用 `@tau/editor` 与数据/产物协议 `@tau/plugins`，不依赖宿主源码，不执行普通 SDK/UI 根入口的占位脚本。Editor、默认内置扩展、UI、预编译 CSS 与资源随站点构建；内容插件仍消费发布时的实际 C23 产物。
 
-先在同级 `../editor` 准备公共库依赖，再在本工程独立安装依赖：
+候选阶段的仓库外验证已完成；SDK 的公共 npm 发布需先协调 registry 已有 0.18.0 与 master 0.17.0 的差异，不能把候选验证当成公开安装完成。正式锁文件/公开版本交付后，在本工程运行：
 
 ```sh
 pnpm install --frozen-lockfile --ignore-scripts
@@ -17,7 +17,7 @@ node node_modules/typescript/bin/tsc --noEmit
 node node_modules/vitest/vitest.mjs run --config vitest.config.ts
 ```
 
-`@tau/*` 通过 package.json 的显式 link 引用公共库源码；构建工具、Router 和测试依赖由本工程的锁文件管理，不借用 apps/blog 或 apps/desktop 的依赖目录。构建脚本根据公共库链接定位源码并生成本地样式扫描文件，该文件不进入插件包。若公共库放在其他位置，更新对应 link 路径后重新安装依赖。
+正文资源读取、C23 模块映射、摘要校验、实例样式和全页 HTML 适配在 `src/published/`，使用 Editor 的公开能力；不复制编辑器实现，不扫描宿主源码。页面保留图片偏好、媒体插槽、业务节点和内容链接等自身扩展，全部从明确的公开子入口接入。
 
 产物：
 
@@ -40,8 +40,9 @@ node node_modules/vitest/vitest.mjs run --config vitest.config.ts
 在宿主 checkout 执行：
 
 ```sh
+node scripts/editor/verify-author.mjs /绝对路径/tau-blog-template --candidate
 node scripts/plugins/verify-blog-template.mjs /绝对路径/tau-blog-template
 TAU_VERIFY_BLOG_BROWSER=1 node scripts/plugins/verify-blog-template.mjs /绝对路径/tau-blog-template
 ```
 
-第二条使用隐藏 Electron 窗口验证行为；可用 TAU_ELECTRON_BIN 指定本机 Electron 可执行文件。检查记录写入宿主 output/blog-template-integration/。不截图、不进行视觉走查，外观由用户验收。正式 SQLite 选取与上传提供方由宿主现有入口负责，检查脚本使用真实形状的数据夹具，网络发布与真实账户另由使用者验收。
+第一条生成无宿主源码的候选作者目录并完整验证，路径记录在 output/author-verification；后两条可传该目录，第三条使用隐藏 Electron 窗口验证行为。可用 TAU_ELECTRON_BIN 指定本机 Electron 可执行文件。检查记录写入宿主 output/blog-template-integration/。不截图、不进行视觉走查，外观由用户验收。正式 SQLite 选取与上传提供方由宿主现有入口负责，检查脚本使用真实形状的数据夹具，网络发布与真实账户另由使用者验收。

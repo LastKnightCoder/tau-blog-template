@@ -1,6 +1,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import type { InitData } from "@blog/types";
-import type { PluginDefinition } from "@tau/plugins";
+import { PublishedContentCss } from "../published/PublishedContent";
+import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
 
 const BlogDataContext = createContext<InitData | null>(null);
 const emptyPlugins: readonly PluginDefinition[] = [];
@@ -17,7 +18,7 @@ export function BlogDataProvider({
   return (
     <BlogDataContext.Provider value={data}>
       <BlogPluginsContext.Provider value={plugins}>
-        {children}
+        <PublishedContentCss value={data.contentStyleText ?? ""}>{children}</PublishedContentCss>
       </BlogPluginsContext.Provider>
     </BlogDataContext.Provider>
   );

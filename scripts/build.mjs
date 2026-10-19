@@ -3,7 +3,6 @@ import {
   readFile,
   writeFile,
   mkdir,
-  realpath,
 } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -12,23 +11,6 @@ import { build } from "vite";
 import AdmZip from "adm-zip";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const host = path.resolve(
-  await realpath(path.join(root, "node_modules/@tau/plugins")),
-  "../..",
-);
-const sourceDirs = [
-  "packages/ui/src",
-  "packages/editor/src",
-  "packages/shared/src",
-  "packages/editor-source-view/src",
-  ...(await readdir(path.join(host, "editor-extensions"), { withFileTypes: true }))
-    .filter(entry => entry.isDirectory())
-    .map(entry => `editor-extensions/${entry.name}/src`),
-];
-await writeFile(
-  path.join(root, "src/styles/host-sources.css"),
-  sourceDirs.map(dir => `@source ${JSON.stringify(path.join(host, dir))};`).join("\n"),
-);
 await build({ root, configFile: path.join(root, "vite.config.ts") });
 const site = path.join(root, "dist/site");
 const integrity = {};
@@ -77,6 +59,5 @@ console.log(
     id: manifest.id,
     files: Object.keys(integrity).length,
     zipBytes: bytes.length,
-    hostSource: host,
   }),
 );

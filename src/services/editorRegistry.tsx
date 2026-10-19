@@ -1,4 +1,4 @@
-import { IFileService, IResourceService } from "@tau/shared/host-services";
+import { IFileService, IResourceService } from "@tau/editor/host-services";
 import { forwardRef } from "react";
 import type { ImgHTMLAttributes } from "react";
 import type { ServiceRegistration } from "@tau/editor";
@@ -8,13 +8,13 @@ import {
   type EditorSlots,
   type VideoSlotProps,
   type AudioSlotProps,
-} from "@tau/editor-media/services";
+} from "@tau/editor/extensions/media/services";
 import {
   type ImageBorderRadiusPreset,
   type ImageShadowPreset,
-} from "@tau/editor-media/types";
-import { type ImageAppearanceConfig } from "@tau/editor-media";
-import { AudioPlayer, VideoPlayer } from "@tau/shared";
+} from "@tau/editor/extensions/media/types";
+import { type ImageAppearanceConfig } from "@tau/editor/extensions/media";
+import { AudioPlayer, VideoPlayer } from "@tau/editor/extensions/media/players";
 import { blogVideoContentProviders } from "../editor-providers/videoProviders";
 
 export interface BlogPublishSettings {

@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import classNames from "classnames";
-import { Tooltip, toast } from "@tau/ui";
+import { Tooltip, toast } from "@tau/editor/ui";
 import {
   defineElement,
   defineExtension,
@@ -18,7 +18,7 @@ import {
 import { RenderElementProps } from "slate-react";
 import { Editor } from "@tau/editor";
 import type { EditorKit } from "@tau/editor";
-import type { PluginDefinition } from "@tau/plugins";
+import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
 import { getBlogKit } from "@blog/services/editorKit";
 import { joinPath } from "@blog/utils";
 import type { ContentLinkTarget } from "@blog/types";
@@ -212,6 +212,7 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
           const loaded = await loadPublishedPluginDefinitions(
             data.pluginRenderers ?? [],
             data.baseUrl,
+            `[data-blog-runtime="${scopeId}"]`,
           );
           plugins = loaded.definitions;
           disposeStyles = () => {

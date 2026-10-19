@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter, useLocation } from "react-router-dom";
-import { UiProvider } from "@tau/ui";
+import { UiProvider } from "@tau/editor/ui";
 import { BlogDataProvider } from "./services/data-context";
 import {
   adaptData,
@@ -11,7 +11,7 @@ import {
   loadContentStyles,
 } from "./services/data";
 import { loadPublishedPluginDefinitions } from "./services/plugin-runtime";
-import type { PluginDefinition } from "@tau/plugins";
+import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
 import { initTheme } from "./utils";
 import type { InitData } from "./types";
 import HomePage from "./templates/home/HomePage";
@@ -51,16 +51,18 @@ function BlogRouter() {
         key,
         signal: controller.signal,
       });
+      const scopeId = crypto.randomUUID();
       const plugins = await loadPublishedPluginDefinitions(
         result.data.pluginRenderers ?? [],
         result.dataUrl,
+        `[data-blog-runtime="${scopeId}"]`,
+        controller.signal,
       );
       disposals.push(plugins.dispose);
       if (controller.signal.aborted) {
         plugins.dispose();
         return;
       }
-      const scopeId = crypto.randomUUID();
       const disposeCss = await loadContentStyles(
         result,
         `[data-blog-runtime="${scopeId}"] [data-slate-editor="true"]`,

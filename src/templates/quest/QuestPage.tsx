@@ -21,7 +21,7 @@ import {
 import { QuestAnswerData, QuestData } from "@blog/types";
 import DndProvider from "@blog/components/DndProvider";
 import { getBlogKit, useBlogKit } from "@blog/services/editorKit";
-import type { PluginDefinition } from "@tau/plugins";
+import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 import { CitationProvider, CitationScope } from "@blog/components/Citation";
 import {
@@ -75,16 +75,18 @@ const AnswerContent = memo(
           signal: controller.signal,
         });
         const data = adaptData(result);
+        const scopeId = crypto.randomUUID();
         const loaded = await loadPublishedPluginDefinitions(
           result.data.pluginRenderers ?? [],
           result.dataUrl,
+          `[data-blog-runtime="${scopeId}"]`,
+          controller.signal,
         );
         disposals.push(loaded.dispose);
         if (controller.signal.aborted) {
           loaded.dispose();
           return;
         }
-        const scopeId = crypto.randomUUID();
         const disposeCss = await loadContentStyles(
           result,
           `[data-blog-runtime="${scopeId}"] [data-slate-editor="true"]`,

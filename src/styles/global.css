@@ -1,7 +1,4 @@
-@import "@tau/editor-callout/styles.css";
-@import "@tau/editor-text-formatting/styles.css";
-@import "@tau/editor-comment/styles.css";
-@import "@tau/editor-list/styles.css";
+@import "@tau/editor/styles.css";
 /* Cal Sans（标题展示字体） */
 @import "cal-sans";
 /* JetBrains Mono（等宽字体） */
@@ -9,12 +6,11 @@
 @import "@fontsource/jetbrains-mono/500.css";
 
 @import "tailwindcss";
-@import "@tau/themes/scale.css";
+@import "@tau/editor/theme/scale.css";
 /* 编辑器的浮层原语来自 @tau/ui，类名经 @tau/themes 的语义映射取 --tau-* */
-@import "@tau/themes/tailwind.css";
+@import "@tau/editor/theme/tailwind.css";
 @import "./legacy-palette.css";
 @import "./tau-tokens.css";
-@import "./host-sources.css";
 
 @custom-variant dark (.dark &);
 
