@@ -8,8 +8,6 @@ export type ResolvedContentLinkTarget = ContentLinkTarget;
 export type ContentLinkPreviewData = {
   title: string;
   content: Descendant[];
-  pluginRenderers?: InitData["pluginRenderers"];
-  baseUrl: string;
   initData: InitData;
   result: DataResult;
 };
@@ -46,8 +44,6 @@ export async function loadContentLinkPreview(
       : [
           { type: "paragraph", children: [{ type: "formatted", text: "" }] },
         ]) as Descendant[],
-    pluginRenderers: initData.pluginRenderers,
-    baseUrl: result.dataUrl,
     initData,
     result,
   };

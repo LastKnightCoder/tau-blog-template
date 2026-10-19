@@ -1,12 +1,13 @@
-import { useInitData } from "@blog/services/data-context";
+import { useInitData, useBlogContent } from "@blog/services/data-context";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Header, DocSidebar } from "@blog/components/Layout";
 import { Breadcrumb, ScrollToTop } from "@blog/components/Common";
-import { Editor } from "@tau/editor";
+import { ContentRenderer } from "@tau/editor/renderer";
 import Outline from "@blog/components/Outline";
 import { formatDate, joinPath } from "@blog/utils";
 import { DocData } from "@blog/types";
 import { HeaderElement } from "@tau/editor/extensions/header";
+import type { Editor as SlateEditor } from "slate";
 import { getInlineElementText } from "@blog/utils/editor";
 import DndProvider from "@blog/components/DndProvider";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
@@ -15,7 +16,7 @@ import { useBlogKit } from "@blog/services/editorKit";
 const DOC_SIDEBAR_SCROLL_STORAGE_KEY = "blog:doc-sidebar-scroll";
 const DOC_SIDEBAR_COLLAPSE_STORAGE_KEY = "blog:doc-sidebar-collapse";
 
-function extractHeaders(content: unknown[]) {
+function extractHeaders(content: unknown[], editor?: SlateEditor) {
   const headers: { level: number; title: string }[] = [];
   for (const node of content) {
     if (node && typeof node === "object") {
@@ -24,7 +25,9 @@ function extractHeaders(content: unknown[]) {
         const header = n as unknown as HeaderElement;
         headers.push({
           level: header.level,
-          title: header.children.map(getInlineElementText).join(""),
+          title: header.children
+            .map((child) => getInlineElementText(child, editor))
+            .join(""),
         });
       }
     }
@@ -34,15 +37,21 @@ function extractHeaders(content: unknown[]) {
 
 const DocPage = memo(() => {
   const initData = useInitData();
+  const content = useBlogContent();
   const { site, navigation, sidebar } = initData;
   const doc = initData.content as DocData;
   const docCollections = initData.docCollections || [];
   const blogSettings = initData.settings;
   const kit = useBlogKit(blogSettings);
+  const [renderedHeaders, setRenderedHeaders] =
+    useState<ReturnType<typeof extractHeaders>>();
   const sidebarScrollRef = useRef<HTMLDivElement | null>(null);
   const [activeHeaderIndex, setActiveHeaderIndex] = useState(0);
 
-  const headers = useMemo(() => extractHeaders(doc.content), [doc.content]);
+  const headers = useMemo(
+    () => renderedHeaders ?? extractHeaders(doc.content),
+    [doc.content, renderedHeaders],
+  );
   const activeCollectionTitle = useMemo(() => {
     for (const collection of docCollections) {
       const activeItem = collection.items.find((item) => item.active);
@@ -295,7 +304,14 @@ const DocPage = memo(() => {
 
                   {/* 正文 */}
                   <DndProvider>
-                    <Editor kit={kit} initValue={doc.content} readonly />
+                    <ContentRenderer
+                      content={content}
+                      kit={kit}
+                      initValue={doc.content}
+                      onInit={(editor, nodes) =>
+                        setRenderedHeaders(extractHeaders(nodes, editor))
+                      }
+                    />
                   </DndProvider>
 
                   {/* 上下篇导航：简洁文本链接 */}

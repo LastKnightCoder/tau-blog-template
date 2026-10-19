@@ -2,13 +2,13 @@
 
 插件 ID：`tau.blog`。源码基于主项目 master `8914722c1` 的 `apps/blog` 复制，保留页面、样式、主题、目录、标签、卡片、文章、项目文档、求索录、搜索及正文预览。原工程保持不动，旧说明见 [原博客说明](docs/原博客说明.md)。
 
-宿主只负责数据、搜索和插件产物协议。此模板自己选择 React、EditorKit、HashRouter 和预览 UI，自己校验、求值并渲染内容插件，不调用桌面 create/activate。其他模板无需使用这些实现。
+宿主只负责数据、搜索和插件产物协议。此模板自己选择 React、HashRouter 和预览 UI，正文通过公开 ContentRenderer 接入，不调用桌面 create/activate。其他模板无需使用这些实现。
 
 ## 构建
 
 本工程只消费两个 Tau 公开依赖：通用 `@tau/editor` 与数据/产物协议 `@tau/plugins`，不依赖宿主源码，不执行普通 SDK/UI 根入口的占位脚本。Editor、默认内置扩展、UI、预编译 CSS 与资源随站点构建；内容插件仍消费发布时的实际 C23 产物。
 
-公开依赖固定为 `@xiongtao.xt/tau-editor@0.1.0` 和 `@xiongtao.xt/tau-plugins@0.19.0`，通过 npm 别名沿用代码中的 `@tau/editor`、`@tau/plugins`。在本工程按锁文件安装并构建：
+公开依赖固定为 `@xiongtao.xt/tau-editor@0.2.0` 和 `@xiongtao.xt/tau-plugins@0.19.0`，通过 npm 别名沿用代码中的 `@tau/editor`、`@tau/plugins`。正文统一使用 `@tau/editor/renderer` 的 ContentRenderer。在本工程按锁文件安装并构建：
 
 ```sh
 pnpm install --frozen-lockfile --ignore-scripts
@@ -17,7 +17,7 @@ node node_modules/typescript/bin/tsc --noEmit
 node node_modules/vitest/vitest.mjs run --config vitest.config.ts
 ```
 
-正文资源读取、C23 模块映射、摘要校验、实例样式和全页 HTML 适配在 `src/published/`，使用 Editor 的公开能力；不复制编辑器实现，不扫描宿主源码。页面保留图片偏好、媒体插槽、业务节点和内容链接等自身扩展，全部从明确的公开子入口接入。
+正文读取后的插件加载、摘要校验、共享模块和样式清理由公开渲染器封装，模板不维护 src/published 或具体插件适配。页面保留图片偏好、媒体插槽、业务节点和内容链接等自身扩展，从公开能力接入；不复制编辑器实现，不扫描宿主源码。
 
 产物：
 
@@ -33,7 +33,7 @@ node node_modules/vitest/vitest.mjs run --config vitest.config.ts
 
 本模板的公开路径示例为 `/#/articles/1`、`/#/cards`、`/#/projects/12/34`、`/#/quests/9`。部署在 /notes/ 时为 `/notes/#/projects/12/34`。这些规则由本模板定义；浏览器前进、后退与 hash 深链交给 HashRouter，无需服务器业务 URL 回退。
 
-正文、悬停预览和复用答案各持独立数据上下文与编辑器实例。伴生 CSS 按 dataUrl 读取并验证摘要，限定到对应实例，关闭后释放。全页 HTML 使用模板自己的 iframe，支持脚本与伴生 CSS；普通 HTML 片段继续使用原渲染器。框架与 DOM 约定没有进入宿主契约。
+正文、悬停预览和复用答案各持独立数据上下文，分别挂载 ContentRenderer；插件与样式由组件按实例处理，关闭后清理。HTML 直接使用原插件渲染，不引入 iframe 或改写 render。框架与 DOM 约定没有进入宿主契约。
 
 ## 验证
 

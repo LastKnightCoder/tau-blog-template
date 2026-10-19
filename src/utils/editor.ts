@@ -1,7 +1,16 @@
-export const getInlineElementText = (value: unknown): string => {
+import type { Editor, Node } from "slate";
+import { ReactEditor } from "slate-react";
+
+export const getInlineElementText = (
+  value: unknown,
+  editor?: Editor,
+): string => {
   if (!value || typeof value !== "object") return "";
   const element = value as {
-    type?: string; text?: string; tex?: string; html?: string; alt?: string;
+    type?: string;
+    text?: string;
+    tex?: string;
+    alt?: string;
     children?: { text?: string }[];
   };
   if (
@@ -22,11 +31,20 @@ export const getInlineElementText = (value: unknown): string => {
       return element.children?.[0]?.text ?? "";
     case "inline-math":
       return element.tex ?? "";
-    case "html-inline":
-      return element.html ?? "";
     case "inline-image":
       return element.alt ?? "[Image]";
     default:
-      return "";
+      if (editor) {
+        try {
+          return ReactEditor.toDOMNode(editor, value as Node).textContent ?? "";
+        } catch {
+          return "";
+        }
+      }
+      return (
+        element.children
+          ?.map((child) => getInlineElementText(child))
+          .join("") ?? ""
+      );
   }
 };

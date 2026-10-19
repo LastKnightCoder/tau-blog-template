@@ -1,38 +1,24 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, it } from "vitest";
-import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
+import type { DataResult } from "@tau/editor/renderer";
 import type { InitData } from "@blog/types";
-import { BlogDataProvider, useInitData } from "./data-context";
-import { useBlogKit } from "./editorKit";
+import { BlogDataProvider, useInitData, useBlogContent } from "./data-context";
 
-it("并列及嵌套正文从各自上下文取得插件贡献，空贡献不继承父正文", () => {
+it("并列和嵌套页面各自传递原始正文，渲染器无需模板装配插件", () => {
   const container = document.createElement("div");
   const root = createRoot(container);
   const environment = globalThis as Record<string, unknown>;
   const previous = environment.IS_REACT_ACT_ENVIRONMENT;
   environment.IS_REACT_ACT_ENVIRONMENT = true;
-  const plugin = (type: string): PluginDefinition => ({
-    id: type,
-    name: type,
-    version: "1.0.0",
-    editorExtensions: [
-      {
-        id: type,
-        apiVersion: 1,
-        elements: [{ type, kind: "block", render: () => null }],
-      },
-    ],
-    create: () => ({}),
-  });
+  const content = (key: string) => ({ data: { key } }) as DataResult;
   const data = (title: string) => ({ site: { title } }) as InitData;
   function Probe() {
     const value = useInitData();
-    const kit = useBlogKit();
+    const source = useBlogContent();
     return (
       <p>
-        {value.site.title}:
-        {kit.elementTypes.filter((type) => type.startsWith("test.")).join(",")}
+        {value.site.title}:{source.data.key}
       </p>
     );
   }
@@ -40,21 +26,24 @@ it("并列及嵌套正文从各自上下文取得插件贡献，空贡献不继�
     act(() =>
       root.render(
         <>
-          <BlogDataProvider data={data("正文")} plugins={[plugin("test.page")]}>
+          <BlogDataProvider data={data("正文")} content={content("test.page")}>
             <Probe />
             <BlogDataProvider
               data={data("预览")}
-              plugins={[plugin("test.preview")]}
+              content={content("test.preview")}
             >
               <Probe />
             </BlogDataProvider>
-            <BlogDataProvider data={data("无插件")}>
+            <BlogDataProvider
+              data={data("无插件")}
+              content={content("test.empty")}
+            >
               <Probe />
             </BlogDataProvider>
           </BlogDataProvider>
           <BlogDataProvider
             data={data("另一正文")}
-            plugins={[plugin("test.other")]}
+            content={content("test.other")}
           >
             <Probe />
           </BlogDataProvider>
@@ -66,7 +55,7 @@ it("并列及嵌套正文从各自上下文取得插件贡献，空贡献不继�
     ).toEqual([
       "正文:test.page",
       "预览:test.preview",
-      "无插件:",
+      "无插件:test.empty",
       "另一正文:test.other",
     ]);
   } finally {

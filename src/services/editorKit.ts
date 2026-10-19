@@ -5,14 +5,12 @@ import { createEditorKit, type EditorKit } from "@tau/editor";
 import { createImageExtensions } from "@tau/editor/extensions/media";
 import { standardExtensions } from "../editorExtensions/standard";
 import { useMemo } from "react";
-import { useBlogPlugins } from "./data-context";
 import { diagramExtensions } from "@tau/editor/extensions/diagram";
 import { previewMenuExtension } from "@tau/editor/source-view/menu";
 import codeBlockExtension from "@tau/editor/extensions/code-block";
 import { mathExtensions } from "@tau/editor/extensions/math";
 import emojiExtension from "@tau/editor/extensions/emoji";
 import { blogEditorExtensions } from "../editorExtensions";
-import { adaptPublishedExtensions } from "../published/PublishedContent";
 import {
   blogEditorServices,
   getBlogImageAppearance,
@@ -23,15 +21,7 @@ const cache = new WeakMap<BlogPublishSettings, EditorKit>();
 const defaultSettings: BlogPublishSettings = {};
 
 export function useBlogKit(settings?: BlogPublishSettings): EditorKit {
-  const plugins = useBlogPlugins();
-  return useMemo(
-    () =>
-      getBlogKit(
-        settings,
-        plugins.flatMap((plugin) => plugin.editorExtensions ?? []),
-      ),
-    [settings, plugins],
-  );
+  return useMemo(() => getBlogKit(settings), [settings]);
 }
 
 export function getBlogKit(
@@ -61,6 +51,6 @@ export function getBlogKit(
     cache.set(snapshot, kit);
   }
   return contributions.length
-    ? kit.extend({ extensions: adaptPublishedExtensions(contributions), override: true })
+    ? kit.extend({ extensions: contributions, override: true })
     : kit;
 }

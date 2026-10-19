@@ -1,10 +1,10 @@
-import { useInitData } from "@blog/services/data-context";
+import { useInitData, useBlogContent } from "@blog/services/data-context";
 import { memo, useMemo } from "react";
 import { motion } from "motion/react";
 import { Header } from "@blog/components/Layout";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
 import { Tag, ScrollToTop } from "@blog/components/Common";
-import { Editor } from "@tau/editor";
+import { ContentRenderer } from "@tau/editor/renderer";
 import { formatDate, getReadingTime, joinPath } from "@blog/utils";
 import { CardData, LinkedCardInfo } from "@blog/types";
 import DndProvider from "@blog/components/DndProvider";
@@ -41,6 +41,7 @@ LinkedCardItem.displayName = "LinkedCardItem";
 
 const CardPage = memo(() => {
   const initData = useInitData();
+  const content = useBlogContent();
   const { site, navigation } = initData;
   const card = initData.content as CardData;
   const docCollections = initData.docCollections || [];
@@ -118,7 +119,11 @@ const CardPage = memo(() => {
 
               {/* 正文 */}
               <DndProvider>
-                <Editor kit={kit} initValue={card.content} readonly />
+                <ContentRenderer
+                  content={content}
+                  kit={kit}
+                  initValue={card.content}
+                />
               </DndProvider>
 
               {/* 更新时间 */}

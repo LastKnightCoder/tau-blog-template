@@ -5,10 +5,13 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import DocPage from "./DocPage";
-import { mockDocPageSidebarDemoData } from "@blog/test-fixtures/page-data";
+import {
+  mockDocPageSidebarDemoData,
+  publishedResult,
+} from "@blog/test-fixtures/page-data";
 
-vi.mock("@tau/editor", () => ({
-  Editor: () => <div data-slate-editor="true" />,
+vi.mock("@tau/editor/renderer", () => ({
+  ContentRenderer: () => <div data-slate-editor="true" />,
 }));
 
 vi.mock("@blog/components/Outline", () => ({
@@ -62,7 +65,10 @@ describe("DocPage", () => {
   it("移动端 Header 菜单应包含当前文档树导航", async () => {
     await act(async () => {
       root.render(
-        <BlogDataProvider data={mockDocPageSidebarDemoData}>
+        <BlogDataProvider
+          data={mockDocPageSidebarDemoData}
+          content={publishedResult(mockDocPageSidebarDemoData)}
+        >
           <DocPage />
         </BlogDataProvider>,
       );

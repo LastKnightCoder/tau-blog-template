@@ -1,29 +1,31 @@
 import { createContext, useContext, type ReactNode } from "react";
 import type { InitData } from "@blog/types";
-import { PublishedContentCss } from "../published/PublishedContent";
-import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
+import type { DataResult } from "@tau/editor/renderer";
 
 const BlogDataContext = createContext<InitData | null>(null);
-const emptyPlugins: readonly PluginDefinition[] = [];
-const BlogPluginsContext = createContext(emptyPlugins);
+const BlogContentContext = createContext<DataResult | undefined>(undefined);
 export function BlogDataProvider({
   data,
-  plugins = emptyPlugins,
+  content,
   children,
 }: {
   data: InitData;
-  plugins?: readonly PluginDefinition[];
+  content?: DataResult;
   children: ReactNode;
 }) {
   return (
     <BlogDataContext.Provider value={data}>
-      <BlogPluginsContext.Provider value={plugins}>
-        <PublishedContentCss value={data.contentStyleText ?? ""}>{children}</PublishedContentCss>
-      </BlogPluginsContext.Provider>
+      <BlogContentContext.Provider value={content}>
+        {children}
+      </BlogContentContext.Provider>
     </BlogDataContext.Provider>
   );
 }
-export const useBlogPlugins = () => useContext(BlogPluginsContext);
+export function useBlogContent() {
+  const content = useContext(BlogContentContext);
+  if (!content) throw new Error("博客正文上下文缺失");
+  return content;
+}
 export function useInitData() {
   const data = useContext(BlogDataContext);
   if (!data) throw new Error("博客数据上下文缺失");

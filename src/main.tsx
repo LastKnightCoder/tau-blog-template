@@ -8,10 +8,8 @@ import {
   dataClient,
   initializeData,
   keyForRoute,
-  loadContentStyles,
 } from "./services/data";
-import { loadPublishedPluginDefinitions } from "./services/plugin-runtime";
-import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
+import type { DataResult } from "@tau/editor/renderer";
 import { initTheme } from "./utils";
 import type { InitData } from "./types";
 import HomePage from "./templates/home/HomePage";
@@ -35,13 +33,11 @@ function BlogRouter() {
   const [view, setView] = useState<{
     key: string;
     data: InitData;
-    scopeId: string;
-    plugins: readonly PluginDefinition[];
+    content: DataResult;
   } | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
     const controller = new AbortController();
-    const disposals: (() => void)[] = [];
     setError("");
     setView(null);
     (async () => {
@@ -51,27 +47,7 @@ function BlogRouter() {
         key,
         signal: controller.signal,
       });
-      const scopeId = crypto.randomUUID();
-      const plugins = await loadPublishedPluginDefinitions(
-        result.data.pluginRenderers ?? [],
-        result.dataUrl,
-        `[data-blog-runtime="${scopeId}"]`,
-        controller.signal,
-      );
-      disposals.push(plugins.dispose);
-      if (controller.signal.aborted) {
-        plugins.dispose();
-        return;
-      }
-      const disposeCss = await loadContentStyles(
-        result,
-        `[data-blog-runtime="${scopeId}"] [data-slate-editor="true"]`,
-      );
-      disposals.push(disposeCss);
-      if (controller.signal.aborted) {
-        disposeCss();
-        return;
-      }
+      if (controller.signal.aborted) return;
       const data = adaptData(result);
       const query = new URLSearchParams(location.search);
       data.activeTag = query.get("tag") ?? undefined;
@@ -80,16 +56,14 @@ function BlogRouter() {
       const title =
         "title" in data.content ? data.content.title : data.site.title;
       document.title = `${title || data.site.title} · ${data.site.title}`;
-      setView({ key, data, scopeId, plugins: plugins.definitions });
+      setView({ key, data, content: result });
       window.scrollTo(0, 0);
     })().catch((error) => {
-      disposals.forEach((dispose) => dispose());
       if (!controller.signal.aborted)
         setError(error instanceof Error ? error.message : String(error));
     });
     return () => {
       controller.abort();
-      disposals.forEach((dispose) => dispose());
     };
   }, [location.pathname, location.search]);
   if (error)
@@ -106,8 +80,8 @@ function BlogRouter() {
     );
   const Page = pages[view.data.meta.type];
   return (
-    <div data-blog-runtime={view.scopeId}>
-      <BlogDataProvider data={view.data} plugins={view.plugins}>
+    <div>
+      <BlogDataProvider data={view.data} content={view.content}>
         <Page key={view.key + location.search} />
       </BlogDataProvider>
     </div>

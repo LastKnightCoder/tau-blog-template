@@ -1,17 +1,15 @@
-import { useInitData, BlogDataProvider } from "@blog/services/data-context";
 import {
-  adaptData,
-  dataClient,
-  loadContentStyles,
-  contentStyleText,
-} from "@blog/services/data";
-import { loadPublishedPluginDefinitions } from "@blog/services/plugin-runtime";
+  useInitData,
+  useBlogContent,
+  BlogDataProvider,
+} from "@blog/services/data-context";
+import { adaptData, dataClient } from "@blog/services/data";
 import { memo, useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "@blog/components/Layout";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
 import { Tag, ScrollToTop } from "@blog/components/Common";
-import { Editor } from "@tau/editor";
+import { ContentRenderer, type DataResult } from "@tau/editor/renderer";
 import {
   formatDate,
   getReadingTime,
@@ -20,8 +18,7 @@ import {
 } from "@blog/utils";
 import { QuestAnswerData, QuestData } from "@blog/types";
 import DndProvider from "@blog/components/DndProvider";
-import { getBlogKit, useBlogKit } from "@blog/services/editorKit";
-import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
+import { useBlogKit } from "@blog/services/editorKit";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 import { CitationProvider, CitationScope } from "@blog/components/Citation";
 import {
@@ -45,9 +42,7 @@ type LoadedAnswerContent = {
   content: QuestAnswerData["content"];
   error: boolean;
   data?: import("@blog/types").InitData;
-  kit?: import("@tau/editor").EditorKit;
-  scopeId?: string;
-  plugins?: readonly PluginDefinition[];
+  result?: DataResult;
 };
 const AnswerContent = memo(
   ({
@@ -58,6 +53,7 @@ const AnswerContent = memo(
     settings: ReturnType<typeof useInitData>["settings"];
   }) => {
     const inlineKit = useBlogKit(settings);
+    const inlineResult = useBlogContent();
     const sourceKey = answer.source?.key;
     const [remote, setRemote] = useState<LoadedAnswerContent>({
       loading: Boolean(sourceKey && !answer.content),
@@ -67,7 +63,6 @@ const AnswerContent = memo(
     useEffect(() => {
       if (!sourceKey || answer.content) return;
       const controller = new AbortController();
-      const disposals: (() => void)[] = [];
       setRemote({ loading: true, content: undefined, error: false });
       (async () => {
         const result = await dataClient().readData({
@@ -75,28 +70,7 @@ const AnswerContent = memo(
           signal: controller.signal,
         });
         const data = adaptData(result);
-        const scopeId = crypto.randomUUID();
-        const loaded = await loadPublishedPluginDefinitions(
-          result.data.pluginRenderers ?? [],
-          result.dataUrl,
-          `[data-blog-runtime="${scopeId}"]`,
-          controller.signal,
-        );
-        disposals.push(loaded.dispose);
-        if (controller.signal.aborted) {
-          loaded.dispose();
-          return;
-        }
-        const disposeCss = await loadContentStyles(
-          result,
-          `[data-blog-runtime="${scopeId}"] [data-slate-editor="true"]`,
-        );
-        disposals.push(disposeCss);
-        data.contentStyleText = contentStyleText(result);
-        if (controller.signal.aborted) {
-          disposeCss();
-          return;
-        }
+        if (controller.signal.aborted) return;
         const content =
           "content" in data.content && Array.isArray(data.content.content)
             ? data.content.content
@@ -106,23 +80,14 @@ const AnswerContent = memo(
           content,
           error: !content,
           data,
-          scopeId,
-          plugins: loaded.definitions,
-          kit: getBlogKit(
-            data.settings,
-            loaded.definitions.flatMap(
-              (definition) => definition.editorExtensions ?? [],
-            ),
-          ),
+          result,
         });
       })().catch(() => {
-        disposals.forEach((dispose) => dispose());
         if (!controller.signal.aborted)
           setRemote({ loading: false, content: undefined, error: true });
       });
       return () => {
         controller.abort();
-        disposals.forEach((dispose) => dispose());
       };
     }, [answer.content, sourceKey]);
     if (remote.loading)
@@ -138,18 +103,18 @@ const AnswerContent = memo(
         </p>
       );
     const body = (
-      <div data-blog-runtime={remote.scopeId}>
+      <div>
         <DndProvider>
-          <Editor
-            kit={remote.kit ?? inlineKit}
+          <ContentRenderer
+            content={remote.result ?? inlineResult}
+            kit={inlineKit}
             initValue={remote.content}
-            readonly
           />
         </DndProvider>
       </div>
     );
     return remote.data ? (
-      <BlogDataProvider data={remote.data} plugins={remote.plugins}>
+      <BlogDataProvider data={remote.data} content={remote.result}>
         {body}
       </BlogDataProvider>
     ) : (
@@ -246,6 +211,7 @@ AnswerHeader.displayName = "AnswerHeader";
 
 const QuestPage = memo(() => {
   const initData = useInitData();
+  const content = useBlogContent();
   const { site, navigation } = initData;
   const quest = initData.content as QuestData;
   const docCollections = initData.docCollections || [];
@@ -320,10 +286,10 @@ const QuestPage = memo(() => {
                       data-testid="quest-description"
                     >
                       <DndProvider>
-                        <Editor
+                        <ContentRenderer
+                          content={content}
                           kit={kit}
                           initValue={quest.description}
-                          readonly
                           className="text-[var(--color-text-tertiary)]"
                         />
                       </DndProvider>

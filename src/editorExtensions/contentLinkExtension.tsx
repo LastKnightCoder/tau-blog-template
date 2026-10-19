@@ -16,14 +16,11 @@ import {
   type ElementRenderProps,
 } from "@tau/editor";
 import { RenderElementProps } from "slate-react";
-import { Editor } from "@tau/editor";
-import type { EditorKit } from "@tau/editor";
-import type { ContentPluginDefinition as PluginDefinition } from "@blog/published/resources";
+import { ContentRenderer } from "@tau/editor/renderer";
 import { getBlogKit } from "@blog/services/editorKit";
 import { joinPath } from "@blog/utils";
 import type { ContentLinkTarget } from "@blog/types";
 import { BlogDataProvider } from "@blog/services/data-context";
-import { loadContentStyles, contentStyleText } from "@blog/services/data";
 import { CiteMark, useCitationIndex } from "@blog/components/Citation";
 import {
   loadContentLinkPreview,
@@ -48,12 +45,9 @@ type ContentLinkProps = {
 };
 
 type LinkPreviewState = {
-  scopeId?: string;
   loading: boolean;
   data: ContentLinkPreviewData | null;
   error: string;
-  kit?: EditorKit;
-  plugins?: readonly PluginDefinition[];
 };
 
 const unresolvedMessage = "目标未发布或不可用";
@@ -116,17 +110,16 @@ const ContentLinkPreviewPanel = memo(
 
     return (
       <div className="blog-content-link-preview">
-        <div
-          className="blog-content-link-preview-body"
-          data-blog-runtime={state.scopeId}
-        >
-          <BlogDataProvider data={state.data.initData} plugins={state.plugins}>
-            <Editor
+        <div className="blog-content-link-preview-body">
+          <BlogDataProvider
+            data={state.data.initData}
+            content={state.data.result}
+          >
+            <ContentRenderer
+              content={state.data.result}
               initValue={state.data.content}
-              readonly
-              {...(state.kit
-                ? { kit: state.kit }
-                : { extensions: blogContentLinkPreviewExtensions })}
+              kit={getBlogKit(state.data.initData.settings)}
+              extensions={blogContentLinkPreviewExtensions}
             />
           </BlogDataProvider>
         </div>
@@ -179,7 +172,6 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
     }
 
     let cancelled = false;
-    let disposeStyles: (() => void) | undefined;
     const currentRequestId = ++requestIdRef.current;
     setPreviewState((previous) => ({
       ...previous,
@@ -188,62 +180,17 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
     }));
 
     loadContentLinkPreview(target!.key, displayTitle)
-      .then(async (data) => {
+      .then((data) => {
         if (cancelled || requestIdRef.current !== currentRequestId) {
           return;
-        }
-        let kit: EditorKit | undefined;
-        let plugins: readonly PluginDefinition[] = [];
-        const scopeId = crypto.randomUUID();
-        const disposeCss = await loadContentStyles(
-          data.result,
-          `[data-blog-runtime="${scopeId}"] [data-slate-editor="true"]`,
-        );
-        disposeStyles = disposeCss;
-        data.initData.contentStyleText = contentStyleText(data.result);
-        if (cancelled || requestIdRef.current !== currentRequestId) {
-          disposeCss();
-          return;
-        }
-        {
-          const { loadPublishedPluginDefinitions } =
-            await import("@blog/services/plugin-runtime");
-          if (cancelled || requestIdRef.current !== currentRequestId) return;
-          const loaded = await loadPublishedPluginDefinitions(
-            data.pluginRenderers ?? [],
-            data.baseUrl,
-            `[data-blog-runtime="${scopeId}"]`,
-          );
-          plugins = loaded.definitions;
-          disposeStyles = () => {
-            loaded.dispose();
-            disposeCss();
-          };
-          if (cancelled || requestIdRef.current !== currentRequestId) {
-            disposeStyles();
-            return;
-          }
-          kit = getBlogKit(
-            data.initData.settings,
-            loaded.definitions.flatMap(
-              (definition) => definition.editorExtensions ?? [],
-            ),
-          ).extend({
-            extensions: blogContentLinkPreviewExtensions,
-            override: true,
-          });
         }
         setPreviewState({
           loading: false,
           data,
-          scopeId,
           error: "",
-          kit,
-          plugins,
         });
       })
       .catch(() => {
-        disposeStyles?.();
         if (cancelled || requestIdRef.current !== currentRequestId) {
           return;
         }
@@ -256,7 +203,6 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
 
     return () => {
       cancelled = true;
-      disposeStyles?.();
     };
   }, [open, canPreview, displayTitle, target?.key]);
 

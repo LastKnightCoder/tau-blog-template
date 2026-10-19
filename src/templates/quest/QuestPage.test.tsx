@@ -2,14 +2,6 @@ const dataRead = vi.hoisted(() => vi.fn());
 vi.mock("@blog/services/data", () => ({
   dataClient: () => ({ readData: dataRead }),
   adaptData: (result: any) => result.data,
-  loadContentStyles: async () => () => {},
-  contentStyleText: () => "",
-}));
-vi.mock("@blog/services/plugin-runtime", () => ({
-  loadPublishedPluginDefinitions: async () => ({
-    definitions: [],
-    dispose() {},
-  }),
 }));
 import { BlogDataProvider } from "@blog/services/data-context";
 import type { InitData } from "@blog/types";
@@ -20,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import QuestPage from "./QuestPage";
 import {
+  publishedResult,
   mockQuestMultiAnswerPageData,
   mockQuestPageData,
 } from "@blog/test-fixtures/page-data";
@@ -37,8 +30,8 @@ vi.mock("@blog/components/Common", () => ({
   ScrollToTop: () => null,
 }));
 
-vi.mock("@tau/editor", () => ({
-  Editor: ({ initValue }: { initValue: any[] }) => (
+vi.mock("@tau/editor/renderer", () => ({
+  ContentRenderer: ({ initValue }: { initValue: any[] }) => (
     <div data-testid="editor">
       {JSON.stringify(initValue)
         .replace(/\\u003c/g, "<")
@@ -85,7 +78,7 @@ describe("QuestPage", () => {
   it("应渲染求索录题目、状态和内嵌答案", async () => {
     await act(async () => {
       root.render(
-        <BlogDataProvider data={pageData}>
+        <BlogDataProvider data={pageData} content={publishedResult(pageData)}>
           <QuestPage />
         </BlogDataProvider>,
       );
@@ -112,7 +105,7 @@ describe("QuestPage", () => {
 
     await act(async () => {
       root.render(
-        <BlogDataProvider data={pageData}>
+        <BlogDataProvider data={pageData} content={publishedResult(pageData)}>
           <QuestPage />
         </BlogDataProvider>,
       );
@@ -131,7 +124,7 @@ describe("QuestPage", () => {
   it("应渲染研究概览、探索过程与分组的参考资料", async () => {
     await act(async () => {
       root.render(
-        <BlogDataProvider data={pageData}>
+        <BlogDataProvider data={pageData} content={publishedResult(pageData)}>
           <QuestPage />
         </BlogDataProvider>,
       );
@@ -168,7 +161,7 @@ describe("QuestPage", () => {
 
     await act(async () => {
       root.render(
-        <BlogDataProvider data={pageData}>
+        <BlogDataProvider data={pageData} content={publishedResult(pageData)}>
           <QuestPage />
         </BlogDataProvider>,
       );
@@ -197,7 +190,7 @@ describe("QuestPage", () => {
 
     await act(async () => {
       root.render(
-        <BlogDataProvider data={pageData}>
+        <BlogDataProvider data={pageData} content={publishedResult(pageData)}>
           <QuestPage />
         </BlogDataProvider>,
       );
@@ -254,7 +247,7 @@ describe("QuestPage", () => {
 
     await act(async () => {
       root.render(
-        <BlogDataProvider data={pageData}>
+        <BlogDataProvider data={pageData} content={publishedResult(pageData)}>
           <QuestPage />
         </BlogDataProvider>,
       );

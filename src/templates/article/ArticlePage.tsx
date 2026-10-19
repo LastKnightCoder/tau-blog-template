@@ -1,10 +1,11 @@
-import { useInitData } from "@blog/services/data-context";
-import { memo, useMemo } from "react";
+import { useInitData, useBlogContent } from "@blog/services/data-context";
+import { memo, useMemo, useState } from "react";
+import type { Editor as SlateEditor } from "slate";
 import { motion } from "motion/react";
 import { Header } from "@blog/components/Layout";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
 import { Tag, ScrollToTop } from "@blog/components/Common";
-import { Editor } from "@tau/editor";
+import { ContentRenderer } from "@tau/editor/renderer";
 import Outline from "@blog/components/Outline";
 import { formatDate, getReadingTime, joinPath } from "@blog/utils";
 import { ArticleData } from "@blog/types";
@@ -14,7 +15,7 @@ import DndProvider from "@blog/components/DndProvider";
 import { useBlogKit } from "@blog/services/editorKit";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 
-function extractHeaders(content: unknown[]) {
+function extractHeaders(content: unknown[], editor?: SlateEditor) {
   const headers: { level: number; title: string }[] = [];
   for (const node of content) {
     if (node && typeof node === "object") {
@@ -23,7 +24,9 @@ function extractHeaders(content: unknown[]) {
         const header = n as unknown as HeaderElement;
         headers.push({
           level: header.level,
-          title: header.children.map(getInlineElementText).join(""),
+          title: header.children
+            .map((child) => getInlineElementText(child, editor))
+            .join(""),
         });
       }
     }
@@ -33,11 +36,14 @@ function extractHeaders(content: unknown[]) {
 
 const ArticlePage = memo(() => {
   const initData = useInitData();
+  const content = useBlogContent();
   const { site, navigation } = initData;
   const article = initData.content as ArticleData;
   const docCollections = initData.docCollections || [];
   const blogSettings = initData.settings;
   const kit = useBlogKit(blogSettings);
+  const [renderedHeaders, setRenderedHeaders] =
+    useState<ReturnType<typeof extractHeaders>>();
 
   const readingTime = useMemo(
     () => getReadingTime(article.content),
@@ -45,8 +51,8 @@ const ArticlePage = memo(() => {
   );
 
   const headers = useMemo(
-    () => extractHeaders(article.content),
-    [article.content],
+    () => renderedHeaders ?? extractHeaders(article.content),
+    [article.content, renderedHeaders],
   );
 
   const handleHeaderClick = (index: number) => {
@@ -143,7 +149,14 @@ const ArticlePage = memo(() => {
 
                   {/* 正文内容 */}
                   <DndProvider>
-                    <Editor kit={kit} initValue={article.content} readonly />
+                    <ContentRenderer
+                      content={content}
+                      kit={kit}
+                      initValue={article.content}
+                      onInit={(editor, nodes) =>
+                        setRenderedHeaders(extractHeaders(nodes, editor))
+                      }
+                    />
                   </DndProvider>
 
                   {/* 标签区域（文章底部） */}

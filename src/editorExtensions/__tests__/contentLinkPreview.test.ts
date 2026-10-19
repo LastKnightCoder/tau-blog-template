@@ -41,7 +41,9 @@ it("按 key 读取，数据缓存留给数据层，每个预览独立装配渲�
   expect(read).toHaveBeenCalledWith({ key: "article:12" });
   expect(first.content).not.toBe(second.content);
   expect(first.initData).not.toBe(second.initData);
-  expect(first.baseUrl).toBe("https://data.example/data/articles/12.hash.json");
+  expect(first.result.dataUrl).toBe(
+    "https://data.example/data/articles/12.hash.json",
+  );
 });
 it("失败不缓存，下一次可重试", async () => {
   read.mockRejectedValueOnce(new Error("数据不可用")).mockResolvedValue({

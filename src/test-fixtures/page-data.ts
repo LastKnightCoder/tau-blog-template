@@ -1,3 +1,4 @@
+import type { DataResult } from "@tau/editor/renderer";
 import type { InitData, DocCollection } from "@blog/types";
 import type { Descendant } from "slate";
 
@@ -396,6 +397,10 @@ export const mockQuestPageData: InitData = {
     publishTime: Date.now(),
   },
 };
+
+export function publishedResult(data: InitData): DataResult {
+  return { dataUrl: "https://example.com/test.json", data: { version: 1, key: "test", meta: data.meta, content: data.content } as DataResult["data"] };
+}
 
 export const mockQuestMultiAnswerPageData: InitData = {
   ...mockQuestPageData,

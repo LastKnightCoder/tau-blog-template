@@ -5,14 +5,10 @@ import type {
   DataResult,
 } from "@tau/plugins/publish-data";
 import type { InitData } from "@blog/types";
-import { scopeRuntimeTailwindCss } from "./content-css";
 
 let source: ReturnType<typeof createClient> | undefined;
 let manifest: DataManifest | undefined;
 let manifestResourceUrl = "";
-const contentCss = new WeakMap<object, string>();
-export const contentStyleText = (result: DataResult) =>
-  contentCss.get(result.data) ?? "";
 export async function initializeData(manifestUrl: string) {
   manifestResourceUrl = manifestUrl;
   source = createClient({ manifestUrl });
@@ -116,7 +112,6 @@ export function adaptData({ data }: DataResult): InitData {
   );
   return {
     site: source.site,
-    contentStyleText: contentCss.get(data),
     navigation,
     content,
     meta: data.meta,
@@ -134,38 +129,5 @@ export function adaptData({ data }: DataResult): InitData {
     cardTagTree: resolveTargets(data.cardTagTree) as InitData["cardTagTree"],
     search: { href: new URL(source.search.data, manifestResourceUrl).href },
     settings: data.settings as InitData["settings"],
-    ...(data.pluginRenderers ? { pluginRenderers: data.pluginRenderers } : {}),
   };
-}
-
-export async function loadContentStyles(
-  result: DataResult,
-  scopeSelector?: string,
-): Promise<() => void> {
-  const styles: HTMLStyleElement[] = [];
-  const sources: string[] = [];
-  try {
-    for (const ref of result.data.contentStyles ?? []) {
-      const response = await fetch(new URL(ref.href, result.dataUrl));
-      if (!response.ok) throw new Error(`正文样式加载失败：${response.status}`);
-      const bytes = await response.arrayBuffer();
-      const hash = [
-        ...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
-      ]
-        .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("");
-      if (hash !== ref.integrity) throw new Error("正文样式摘要错误");
-      const style = document.createElement("style");
-      const source = new TextDecoder().decode(bytes);
-      sources.push(source);
-      style.textContent = scopeRuntimeTailwindCss(source, scopeSelector);
-      document.head.append(style);
-      styles.push(style);
-    }
-    contentCss.set(result.data, sources.join("\n"));
-    return () => styles.forEach((style) => style.remove());
-  } catch (error) {
-    styles.forEach((style) => style.remove());
-    throw error;
-  }
 }
