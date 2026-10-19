@@ -8,7 +8,7 @@
 
 本工程只消费两个 Tau 公开依赖：通用 `@tau/editor` 与数据/产物协议 `@tau/plugins`，不依赖宿主源码，不执行普通 SDK/UI 根入口的占位脚本。Editor、默认内置扩展、UI、预编译 CSS 与资源随站点构建；内容插件仍消费发布时的实际 C23 产物。
 
-候选阶段的仓库外验证已完成；SDK 的公共 npm 发布需先协调 registry 已有 0.18.0 与 master 0.17.0 的差异，不能把候选验证当成公开安装完成。正式锁文件/公开版本交付后，在本工程运行：
+公开依赖固定为 `@xiongtao.xt/tau-editor@0.1.0` 和 `@xiongtao.xt/tau-plugins@0.19.0`，通过 npm 别名沿用代码中的 `@tau/editor`、`@tau/plugins`。在本工程按锁文件安装并构建：
 
 ```sh
 pnpm install --frozen-lockfile --ignore-scripts
@@ -40,9 +40,11 @@ node node_modules/vitest/vitest.mjs run --config vitest.config.ts
 在宿主 checkout 执行：
 
 ```sh
-node scripts/editor/verify-author.mjs /绝对路径/tau-blog-template --candidate
+node scripts/editor/verify-author.mjs /绝对路径/tau-blog-template
 node scripts/plugins/verify-blog-template.mjs /绝对路径/tau-blog-template
 TAU_VERIFY_BLOG_BROWSER=1 node scripts/plugins/verify-blog-template.mjs /绝对路径/tau-blog-template
 ```
 
-第一条生成无宿主源码的候选作者目录并完整验证，路径记录在 output/author-verification；后两条可传该目录，第三条使用隐藏 Electron 窗口验证行为。可用 TAU_ELECTRON_BIN 指定本机 Electron 可执行文件。检查记录写入宿主 output/blog-template-integration/。不截图、不进行视觉走查，外观由用户验收。正式 SQLite 选取与上传提供方由宿主现有入口负责，检查脚本使用真实形状的数据夹具，网络发布与真实账户另由使用者验收。
+第一条生成无宿主源码的作者目录，从公共 npm 按锁文件冻结安装并完整验证，路径记录在 output/author-verification；后两条可传该目录，第三条使用隐藏 Electron 窗口验证行为。可用 TAU_ELECTRON_BIN 指定本机 Electron 可执行文件。检查记录写入宿主 output/blog-template-integration/。不截图、不进行视觉走查，外观由用户验收。正式 SQLite 选取与上传提供方由宿主现有入口负责，检查脚本使用真实形状的数据夹具，网络发布与真实账户另由使用者验收。
+
+维护者在发包前可给第一条追加 `--candidate` 预检本地归档；该模式与公共 registry 验收分别记录，模板作者无需使用。

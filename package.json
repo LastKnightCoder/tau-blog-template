@@ -39,7 +39,7 @@
     "react-router-dom": "6.30.6",
     "postcss": "8.5.6",
     "@tau/editor": "npm:@xiongtao.xt/tau-editor@0.1.0",
-    "@tau/plugins": "npm:@xiongtao.xt/tau-plugins@0.17.1"
+    "@tau/plugins": "npm:@xiongtao.xt/tau-plugins@0.19.0"
   },
   "devDependencies": {
     "@fontsource/jetbrains-mono": "5.3.0",
