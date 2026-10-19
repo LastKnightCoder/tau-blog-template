@@ -35,7 +35,7 @@ beforeEach(async () => {
   await initializeData("https://resources.example/releases/site.json");
 });
 
-it("已知内容引用、侧边栏、项目集合和标签树都保留模板链接", () => {
+it("已知内容引用、侧边栏、项目集合和标签树都保留模板链接", async () => {
   const target = manifest.items[0];
   const href = "/projects/12/34";
   const adapt = (type: DataResult["data"]["meta"]["type"], content: object) =>
@@ -83,36 +83,51 @@ it("已知内容引用、侧边栏、项目集合和标签树都保留模板链�
     ],
     materials: [{ href }, { url: "https://example.com", href: undefined }],
   });
+  // 站点级数据只在清单里出现一次。
+  client.readManifest.mockResolvedValue({
+    ...manifest,
+    projectTrees: {
+      "12": [{ title: "分组", children: [{ title: "文档", target }] }],
+    },
+    collections: [
+      {
+        type: "project",
+        label: "项目",
+        items: [{ id: 12, title: "项目", kind: "project", target }],
+      },
+    ],
+    cardTagTree: [
+      {
+        tag: "父标签",
+        count: 1,
+        cards: [],
+        children: [
+          { tag: "子标签", count: 1, cards: [{ target } as never] },
+        ],
+      },
+    ],
+    contentLinkTargets: { "project-item:34": target },
+  } as DataManifest);
+  await initializeData("https://resources.example/releases/site.json");
   const result = adaptData({
     dataUrl: "https://example.com/data.json",
     data: {
       version: 1,
       key: target.key,
-      meta: { type: "article", publishTime: 0 },
-      content: { title: "文章", content: [] },
-      tree: [{ title: "分组", children: [{ title: "文档", target }] }],
-      collections: [
-        {
-          type: "project",
-          label: "项目",
-          items: [{ id: 12, title: "项目", kind: "project", target }],
-        },
-      ],
-      cardTagTree: [
-        {
-          tag: "父标签",
-          count: 1,
-          cards: [],
-          children: [{ tag: "子标签", count: 1, cards: [{ target }] }],
-        },
-      ],
+      meta: { type: "doc", publishTime: 0 },
+      content: { breadcrumb: [] },
     },
-  } as DataResult);
+  } as unknown as DataResult);
   expect(result.sidebar).toMatchObject([{ children: [{ href }] }]);
   expect(result.docCollections).toMatchObject([{ items: [{ href }] }]);
   expect(result.cardTagTree).toMatchObject([
     { children: [{ cards: [{ href }] }] },
   ]);
+  expect(result.contentLinkTargets?.["project-item:34"]).toMatchObject({
+    contentType: "project-item",
+    refId: 34,
+    href,
+  });
 });
 
 it("模板根据清单元数据定义路由，不解析 key 或数据文件路径", () => {

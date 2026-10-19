@@ -21,6 +21,7 @@ import { getBlogKit } from "@blog/services/editorKit";
 import { joinPath } from "@blog/utils";
 import type { ContentLinkTarget } from "@blog/types";
 import { BlogDataProvider } from "@blog/services/data-context";
+import { openSiteLink } from "@blog/utils/navigation";
 import { CiteMark, useCitationIndex } from "@blog/components/Citation";
 import {
   loadContentLinkPreview,
@@ -216,7 +217,7 @@ const ContentLinkNode = memo((props: ContentLinkProps) => {
       return;
     }
 
-    window.location.href = targetHref;
+    openSiteLink(targetHref);
   };
 
   const linkNode = (

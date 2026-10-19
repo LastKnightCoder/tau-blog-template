@@ -3,10 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { initTheme, toggleTheme, joinPath } from "./index";
 
 it("模板路由拼接不承担数据资源路径和旧路径兼容", () => {
-  expect(joinPath("/notes/", "/projects/12/34")).toBe(
-    "/notes/#/projects/12/34",
-  );
-  expect(joinPath("/notes/", "/docs/custom")).toBe("/notes/#/docs/custom");
+  expect(joinPath("/notes/", "/projects/12/34")).toBe("/notes/projects/12/34");
+  expect(joinPath("/notes/", "/")).toBe("/notes/");
+  expect(joinPath("/", "/cards")).toBe("/cards");
 });
 
 describe("blog/utils theme sync", () => {

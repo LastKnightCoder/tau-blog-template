@@ -1,6 +1,5 @@
 import { useInitData, useBlogContent } from "@blog/services/data-context";
 import { memo, useMemo, useState } from "react";
-import type { Editor as SlateEditor } from "slate";
 import { motion } from "motion/react";
 import { Header } from "@blog/components/Layout";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
@@ -9,29 +8,10 @@ import { Content } from "@blog/components/Content";
 import Outline from "@blog/components/Outline";
 import { formatDate, getReadingTime, joinPath } from "@blog/utils";
 import { ArticleData } from "@blog/types";
-import type { HeaderElement } from "@tau/blog/editor";
-import { getInlineElementText } from "@blog/utils/editor";
+import { extractHeaders } from "@blog/utils/editor";
 import { getBlogKit } from "@blog/services/editorKit";
 import { fadeUp, defaultTransition } from "@blog/utils/motion";
 
-function extractHeaders(content: unknown[], editor?: SlateEditor) {
-  const headers: { level: number; title: string }[] = [];
-  for (const node of content) {
-    if (node && typeof node === "object") {
-      const n = node as Record<string, unknown>;
-      if (n.type === "header" && Array.isArray(n.children)) {
-        const header = n as unknown as HeaderElement;
-        headers.push({
-          level: header.level,
-          title: header.children
-            .map((child) => getInlineElementText(child, editor))
-            .join(""),
-        });
-      }
-    }
-  }
-  return headers;
-}
 
 const ArticlePage = memo(() => {
   const initData = useInitData();

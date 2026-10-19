@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { HashRouter, useLocation } from "react-router-dom";
+import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import { BlogDataProvider } from "./services/data-context";
 import {
   adaptData,
@@ -10,6 +10,7 @@ import {
 } from "./services/data";
 import type { DataResult } from "@tau/blog";
 import { initTheme } from "./utils";
+import { connectNavigation, interceptSiteLinks } from "./utils/navigation";
 import type { InitData } from "./types";
 import HomePage from "./templates/home/HomePage";
 import CardPage from "./templates/card/CardPage";
@@ -27,8 +28,17 @@ const pages = {
   quest: QuestPage,
   list: ListPage,
 };
-function BlogRouter() {
+function BlogRouter({ basePath }: { basePath: string }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const disconnect = connectNavigation(basePath, (route) => navigate(route));
+    document.addEventListener("click", interceptSiteLinks);
+    return () => {
+      document.removeEventListener("click", interceptSiteLinks);
+      disconnect();
+    };
+  }, [basePath, navigate]);
   const [view, setView] = useState<{
     key: string;
     data: InitData;
@@ -104,9 +114,9 @@ async function start() {
   }
   initTheme();
   createRoot(document.getElementById("root")!).render(
-    <HashRouter>
-      <BlogRouter />
-    </HashRouter>,
+    <BrowserRouter basename={data.site.basePath.replace(/\/$/, "") || "/"}>
+      <BlogRouter basePath={data.site.basePath} />
+    </BrowserRouter>,
   );
 }
 void start().catch((error) => {

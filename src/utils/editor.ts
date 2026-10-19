@@ -1,4 +1,5 @@
 import type { Editor, Node } from "slate";
+import type { HeaderElement } from "@tau/blog/editor";
 import { ReactEditor } from "slate-react";
 
 export const getInlineElementText = (
@@ -48,3 +49,23 @@ export const getInlineElementText = (
       );
   }
 };
+
+/** 正文顶层标题，供目录使用。 */
+export function extractHeaders(content: unknown[], editor?: Editor) {
+  const headers: { level: number; title: string }[] = [];
+  for (const node of content) {
+    if (node && typeof node === "object") {
+      const n = node as Record<string, unknown>;
+      if (n.type === "header" && Array.isArray(n.children)) {
+        const header = n as unknown as HeaderElement;
+        headers.push({
+          level: header.level,
+          title: header.children
+            .map((child) => getInlineElementText(child, editor))
+            .join(""),
+        });
+      }
+    }
+  }
+  return headers;
+}

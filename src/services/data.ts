@@ -6,10 +6,14 @@ import type * as Published from "@tau/blog";
 let source: ReturnType<typeof createClient> | undefined;
 let manifest: DataManifest | undefined;
 let manifestResourceUrl = "";
+let routes = new Map<string, string>();
+let keysByRoute = new Map<string, string>();
 export async function initializeData(manifestUrl: string) {
   manifestResourceUrl = manifestUrl;
   source = createClient({ manifestUrl });
   manifest = await source.readManifest();
+  routes = new Map(manifest.items.map((item) => [item.key, routeOf(item)]));
+  keysByRoute = new Map([...routes].map(([key, route]) => [route, key]));
   return manifest;
 }
 export function dataClient() {
@@ -22,9 +26,7 @@ export function dataManifest() {
 }
 
 /** 路由规则属于此博客模板，数据 key 不参与公开路径协议。 */
-export function routeFor(ref: ContentRef): string {
-  const item = dataManifest().items.find((item) => item.key === ref.key);
-  if (!item) throw new Error("目标未发布");
+function routeOf(item: DataManifest["items"][number]): string {
   if (item.type === "home") return "/";
   if (item.type === "doc") return `/projects/${item.projectId}/${item.id}`;
   if (item.type === "list") {
@@ -40,10 +42,14 @@ export function routeFor(ref: ContentRef): string {
   return `/${item.type}s/${item.id}`;
 }
 
+export function routeFor(ref: ContentRef): string {
+  const route = routes.get(ref.key);
+  if (!route) throw new Error("目标未发布");
+  return route;
+}
+
 export function keyForRoute(path: string): string | undefined {
-  const normalized = path.replace(/\/$/, "") || "/";
-  return dataManifest().items.find((item) => routeFor(item) === normalized)
-    ?.key;
+  return keysByRoute.get(path.replace(/\/$/, "") || "/");
 }
 
 function adaptContent(data: Published.PublishedData) {
@@ -159,25 +165,15 @@ export function adaptData({ data }: DataResult): InitData {
     ),
   ];
   const content = adaptContent(data) as InitData["content"];
-  const targets = Object.fromEntries(
-    Object.entries(data.contentLinkTargets ?? {}).map(([identity, ref]) => [
-      identity,
-      {
-        ...ref,
-        contentType: identity.slice(0, identity.lastIndexOf(":")),
-        refId: ref.id ?? 0,
-        href: routeFor(ref),
-      },
-    ]),
-  );
+  const tree = projectId === undefined ? undefined : source.projectTrees?.[projectId];
   return {
     site: source.site,
     navigation,
     content,
     meta: data.meta,
-    contentLinkTargets: targets,
-    sidebar: data.tree && sidebarItems(data.tree),
-    docCollections: data.collections?.map((collection) => ({
+    contentLinkTargets: linkTargets(source),
+    sidebar: tree && sidebarItems(tree),
+    docCollections: source.collections?.map((collection) => ({
       ...collection,
       items: collection.items.map((item) => ({
         ...item,
@@ -185,8 +181,37 @@ export function adaptData({ data }: DataResult): InitData {
         active: data.meta.type === "doc" && item.id === projectId,
       })),
     })),
-    cardTagTree: data.cardTagTree && cardTags(data.cardTagTree),
+    cardTagTree: source.cardTagTree && cardTags(source.cardTagTree),
     search: { href: new URL(source.search.data, manifestResourceUrl).href },
-    settings: data.settings as InitData["settings"],
+    settings: source.settings as InitData["settings"],
   };
+}
+
+/** 站内链接目标键为 `${contentType}:${refId}`：卡片、文章即清单 key，项目条目查清单 contentLinkTargets。 */
+const linkTargetCache = new WeakMap<DataManifest, InitData["contentLinkTargets"]>();
+function linkTargets(source: DataManifest): InitData["contentLinkTargets"] {
+  let targets = linkTargetCache.get(source);
+  if (!targets) {
+    const refs: [string, ContentRef][] = [
+      ...source.items
+        .filter((item) => item.type === "card" || item.type === "article")
+        .map((item): [string, ContentRef] => [item.key, item]),
+      ...Object.entries(source.contentLinkTargets ?? {}),
+    ];
+    targets = Object.fromEntries(
+      refs.map(([identity, ref]) => [
+        identity,
+        {
+          key: ref.key,
+          type: ref.type,
+          id: ref.id,
+          contentType: identity.slice(0, identity.lastIndexOf(":")),
+          refId: Number(identity.slice(identity.lastIndexOf(":") + 1)),
+          href: routeFor(ref),
+        },
+      ]),
+    );
+    linkTargetCache.set(source, targets);
+  }
+  return targets;
 }

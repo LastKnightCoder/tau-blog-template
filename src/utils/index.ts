@@ -44,8 +44,7 @@ export function formatDate(
 export function joinPath(basePath: string, path: string): string {
   if (/^(https?:)?\/\//.test(path)) return path;
   const base = basePath.endsWith("/") ? basePath : basePath + "/";
-  const route = path.startsWith("/") ? path : "/" + path;
-  return base + "#" + route;
+  return base + path.replace(/^\//, "");
 }
 
 /**

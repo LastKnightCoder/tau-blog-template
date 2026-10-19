@@ -13,6 +13,7 @@ import { AlertCircle, Clock, FileSearch, Search, X } from "lucide-react";
 import type { FuseResultMatch } from "fuse.js";
 
 import { joinPath } from "@blog/utils";
+import { openSiteLink } from "@blog/utils/navigation";
 import {
   clearRecentSearchQueries,
   loadBlogSearchIndex,
@@ -229,7 +230,7 @@ const SearchDialog = ({
     if (normalizedQuery) {
       setRecentQueries(saveRecentSearchQuery(normalizedQuery));
     }
-    window.location.href = joinPath(basePath, result.item.href);
+    openSiteLink(joinPath(basePath, result.item.href));
   };
 
   const openRecentQuery = (recentQuery: string) => {

@@ -6,33 +6,13 @@ import { Content } from "@blog/components/Content";
 import Outline from "@blog/components/Outline";
 import { formatDate, joinPath } from "@blog/utils";
 import { DocData } from "@blog/types";
-import type { HeaderElement } from "@tau/blog/editor";
-import type { Editor as SlateEditor } from "slate";
-import { getInlineElementText } from "@blog/utils/editor";
+import { extractHeaders } from "@blog/utils/editor";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
 import { getBlogKit } from "@blog/services/editorKit";
 
 const DOC_SIDEBAR_SCROLL_STORAGE_KEY = "blog:doc-sidebar-scroll";
 const DOC_SIDEBAR_COLLAPSE_STORAGE_KEY = "blog:doc-sidebar-collapse";
 
-function extractHeaders(content: unknown[], editor?: SlateEditor) {
-  const headers: { level: number; title: string }[] = [];
-  for (const node of content) {
-    if (node && typeof node === "object") {
-      const n = node as Record<string, unknown>;
-      if (n.type === "header" && Array.isArray(n.children)) {
-        const header = n as unknown as HeaderElement;
-        headers.push({
-          level: header.level,
-          title: header.children
-            .map((child) => getInlineElementText(child, editor))
-            .join(""),
-        });
-      }
-    }
-  }
-  return headers;
-}
 
 const DocPage = memo(() => {
   const initData = useInitData();
