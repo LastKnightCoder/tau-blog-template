@@ -26,6 +26,18 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: node --input-type=module -e "import fs from 'node:fs'; const {version}=JSON.parse(fs.readFileSync('package.json','utf8')); if(process.env.RELEASE_TAG !== 'v'+version) throw Error('标签与版本号不一致');"
+      - name: 等待 npm 完成新版本处理
+        timeout-minutes: 30
+        run: |
+          for attempt in $(seq 1 60); do
+            if npm view '@xiongtao.xt/tau-blog@0.3.0' version --registry=https://registry.npmjs.org; then
+              exit 0
+            fi
+            echo "npm 正在处理新版本，30 秒后重试（$attempt/60）"
+            sleep 30
+          done
+          echo "npm 新版本尚未可用，请待其公开后重新运行工作流"
+          exit 1
       - name: 安装固定依赖
         run: pnpm install --frozen-lockfile
       - name: 类型检查
