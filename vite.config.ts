@@ -20,13 +20,21 @@ export default defineConfig({
   build: {
     outDir: "dist/site",
     emptyOutDir: true,
+    // 确保所有 CSS 合并到一个文件中，避免外部 CSS 导入问题
+    cssCodeSplit: false,
     rollupOptions: {
       input: resolve(__dirname, "index.html"),
       output: {
         entryFileNames: "assets/[name]-[hash].js",
         chunkFileNames: "assets/[name]-[hash].js",
         assetFileNames: "assets/[name]-[hash].[ext]",
+        // 确保所有模块打包到一起
+        manualChunks: undefined,
       },
     },
+  },
+  // 确保外部包的样式也被处理
+  optimizeDeps: {
+    include: ["@tau/blog"],
   },
 });
