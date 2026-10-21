@@ -4,7 +4,7 @@ import type { Descendant } from "slate";
 
 const baseSiteConfig = {
   title: "我的知识库",
-  description: "记录学习、思考与成长",
+  fields: { description: "记录学习、思考与成长" },
   basePath: "",
 };
 

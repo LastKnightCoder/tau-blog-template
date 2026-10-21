@@ -4,8 +4,9 @@ import type { SearchDocument } from "@tau/blog";
 // 站点配置
 export interface SiteConfig {
   title: string;
-  description: string;
   basePath: string;
+  /** 本模板在 manifest 中声明的站点字段（见 scripts/build.mjs 的 siteFields） */
+  fields?: Record<string, string | boolean>;
 }
 
 // 导航项
@@ -190,10 +191,6 @@ export interface SearchItem extends Omit<SearchDocument, "type"> {
 
 // 首页数据
 export interface HomeData {
-  hero?: {
-    title: string;
-    description: string;
-  };
   timeline: TimelineItem[];
   stats?: {
     articles: number;

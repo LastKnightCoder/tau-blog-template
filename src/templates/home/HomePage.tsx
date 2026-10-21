@@ -5,6 +5,7 @@ import { Header } from "@blog/components/Layout";
 import DocCollectionsMenu from "@blog/components/Layout/DocCollectionsMenu";
 import { formatDate, joinPath, truncate } from "@blog/utils";
 import { HomeData } from "@blog/types";
+import { siteHero } from "@blog/utils/site";
 import {
   fadeUp,
   staggerContainer,
@@ -46,7 +47,8 @@ const HomePage = memo(() => {
     }));
 
   const recentItems = content.timeline.slice(0, 6);
-  const titleChars = content.hero?.title.split("") ?? [];
+  const hero = siteHero(site);
+  const titleChars = hero?.title.split("") ?? [];
 
   return (
     <div className="flex h-[100dvh] flex-col overflow-hidden">
@@ -62,7 +64,7 @@ const HomePage = memo(() => {
       <main className="flex min-h-0 flex-1 items-stretch px-6 sm:px-8 lg:px-12">
         <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 items-center gap-12 lg:gap-20">
           {/* 左栏：Hero + 逐字揭幕 */}
-          {content.hero && (
+          {hero && (
             <div className="flex min-w-0 flex-1 flex-col justify-center py-12">
               <motion.p
                 initial={{ opacity: 0, y: 12 }}
@@ -118,7 +120,7 @@ const HomePage = memo(() => {
                 transition={{ ...heroTransition, delay: 0.9 }}
                 className="mt-5 max-w-md text-base leading-[1.9] text-[var(--color-text-secondary)]"
               >
-                {content.hero.description}
+                {hero.description}
               </motion.p>
 
               <motion.nav

@@ -53,6 +53,15 @@ const manifest = {
     protocolVersion: 1,
     root: "site",
     entries: ["index.html", "404.html"],
+    siteFields: [
+      {
+        key: "description",
+        label: "站点描述",
+        type: "textarea",
+        placeholder: "记录学习与思考",
+        description: "显示在首页标题下方，留空则首页不显示介绍区",
+      },
+    ],
   },
   integrity,
 };
