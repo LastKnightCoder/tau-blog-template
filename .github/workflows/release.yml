@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   release:
@@ -58,3 +59,21 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           gh release create "$RELEASE_TAG" output/tau.blog-*.zip --verify-tag --title "Tau 博客 $RELEASE_TAG" --generate-notes
+      - name: 提交到 Tau 插件中心
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          PORTAL_API: https://plugins-api.taunote.app
+        run: |
+          archive=$(ls output/tau.blog-*.zip)
+          token=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$PORTAL_API" | jq -r .value)
+          echo "::add-mask::$token"
+          status=$(curl -sS -o portal-response.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer $token" -H "Content-Type: application/zip" \
+            --data-binary "@$archive" "$PORTAL_API/v1/ci/releases")
+          cat portal-response.json; echo
+          if [ "$status" = "404" ]; then
+            echo "::warning::模板尚未在插件中心首次提交，请先在 https://plugins.taunote.app 网页提交一次以绑定仓库"
+            exit 0
+          fi
+          test "$status" -lt 300

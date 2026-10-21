@@ -47,6 +47,8 @@ const manifest = {
   minAppVersion: "0.59.0",
   description:
     "保留 Tau 博客的文章、卡片、项目、求索录、搜索与内容预览的独立模板。",
+  categories: ["blog-template"],
+  keywords: ["博客", "个人网站", "静态站点", "主题"],
   template: {
     protocolVersion: 1,
     root: "site",
