@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@tau/blog':
-        specifier: npm:@xiongtao.xt/tau-blog@0.4.0
-        version: '@xiongtao.xt/tau-blog@0.4.0(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/react@19.2.0)(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate-history@0.113.1(slate@0.126.2))(slate-react@0.126.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate@0.126.2))(slate@0.126.2)'
+        specifier: npm:@xiongtao.xt/tau-blog@0.4.1
+        version: '@xiongtao.xt/tau-blog@0.4.1(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/react@19.2.0)(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate-history@0.113.1(slate@0.126.2))(slate-react@0.126.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate@0.126.2))(slate@0.126.2)'
       classnames:
         specifier: 2.5.1
         version: 2.5.1
@@ -687,8 +687,8 @@ packages:
   '@vitest/utils@3.2.7':
     resolution: {integrity: sha512-x6BDOd7dyo3PFLY3I9/HJ25X/6OurhGXk2/B9gOZNPF7XDVjeBK4k01lQE5uvDpbuheErh91qYuE1E2OEjK3Rw==}
 
-  '@xiongtao.xt/tau-blog@0.4.0':
-    resolution: {integrity: sha512-k8xyC2GdtiU0WJ/AI8qwyVymBtsu1QSa9URfzWDp+z1osqaAGi3/Mx7L/N47vazzRFDvCXUqKJcJz+Z2nXAyNw==}
+  '@xiongtao.xt/tau-blog@0.4.1':
+    resolution: {integrity: sha512-S7jj4ZwGmTzGQRjxDVYSRyrJAIK+eQ42qaeqRJQwePcoW7Fi0XX4DXMjhqRXBGJthjSiLj2xlcCGILw+N9X+7w==}
     peerDependencies:
       react: ^19.2.0
       react-dnd: ^16.0.1
@@ -1792,7 +1792,7 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 2.0.0
 
-  '@xiongtao.xt/tau-blog@0.4.0(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/react@19.2.0)(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate-history@0.113.1(slate@0.126.2))(slate-react@0.126.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate@0.126.2))(slate@0.126.2)':
+  '@xiongtao.xt/tau-blog@0.4.1(react-dnd-html5-backend@16.0.1)(react-dnd@16.0.1(@types/react@19.2.0)(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate-history@0.113.1(slate@0.126.2))(slate-react@0.126.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(slate-dom@0.126.0(slate@0.126.2))(slate@0.126.2))(slate@0.126.2)':
     dependencies:
       '@types/react': 19.2.0
       '@types/react-dom': 19.2.0(@types/react@19.2.0)
