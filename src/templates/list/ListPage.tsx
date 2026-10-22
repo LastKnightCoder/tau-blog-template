@@ -17,13 +17,6 @@ const typeLabels: Record<string, string> = {
   card: "卡片",
   article: "文章",
   doc: "文档",
-  quest: "求索录",
-};
-
-const questStatusLabels: Record<string, string> = {
-  not_started: "未开始",
-  in_progress: "进行中",
-  resolved: "已解决",
 };
 
 function matchesTag(tag: string, activeTag: string): boolean {
@@ -181,40 +174,6 @@ const CardListRow = memo(
 
 CardListRow.displayName = "CardListRow";
 
-const QuestListRow = memo(
-  ({ item, basePath }: { item: ListItem; basePath: string }) => (
-    <a
-      href={joinPath(basePath, item.href)}
-      className="group grid grid-cols-1 gap-2 rounded-xl py-7 transition-colors hover:bg-[var(--color-bg-canvas)] md:-mx-4 md:grid-cols-[7rem_1fr] md:gap-8 md:px-4"
-    >
-      <div className="shrink-0 text-sm tabular-nums text-[var(--color-text-tertiary)] md:pt-1">
-        {formatDate(item.updateTime || item.createTime)}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          {item.groupTitle && <Tag name={item.groupTitle} size="sm" />}
-          {item.status && (
-            <span className="tag">
-              {questStatusLabels[item.status] || item.status}
-            </span>
-          )}
-          <span className="text-xs text-[var(--color-text-tertiary)]">
-            {item.answerCount || 0} 答案
-          </span>
-        </div>
-        <h3 className="line-clamp-2 text-xl font-semibold leading-tight text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
-          {item.title || item.summary}
-        </h3>
-        <p className="mt-2 line-clamp-2 text-sm leading-[1.8] text-[var(--color-text-secondary)]">
-          {item.summary}
-        </p>
-      </div>
-    </a>
-  ),
-);
-
-QuestListRow.displayName = "QuestListRow";
-
 const ListPage = memo(() => {
   const navigate = useNavigate();
   const initData = useInitData();
@@ -242,7 +201,6 @@ const ListPage = memo(() => {
   const listTitle = list.title || `全部${typeLabels[list.type] || "内容"}`;
   const isArticleList = list.type === "article";
   const isCardList = list.type === "card";
-  const isQuestList = list.type === "quest";
   const [activeTag, setActiveTag] = useState(
     (initData.activeTag || list.activeTag || "").trim(),
   );
@@ -373,7 +331,7 @@ const ListPage = memo(() => {
                     {listTitle}
                   </h1>
                   <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
-                    共 {totalCount} {isQuestList ? "条求索" : "篇内容"}
+                    共 {totalCount} 篇内容
                   </p>
                 </motion.div>
 
@@ -396,8 +354,6 @@ const ListPage = memo(() => {
                             item={item}
                             basePath={site.basePath}
                           />
-                        ) : isQuestList ? (
-                          <QuestListRow item={item} basePath={site.basePath} />
                         ) : (
                           <CardListRow item={item} basePath={site.basePath} />
                         )}

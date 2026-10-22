@@ -16,7 +16,6 @@ import HomePage from "./templates/home/HomePage";
 import CardPage from "./templates/card/CardPage";
 import ArticlePage from "./templates/article/ArticlePage";
 import DocPage from "./templates/doc/DocPage";
-import QuestPage from "./templates/quest/QuestPage";
 import ListPage from "./templates/list/ListPage";
 import "./styles/global.css";
 
@@ -25,7 +24,6 @@ const pages = {
   card: CardPage,
   article: ArticlePage,
   doc: DocPage,
-  quest: QuestPage,
   list: ListPage,
 };
 function BlogRouter({ basePath }: { basePath: string }) {

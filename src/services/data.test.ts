@@ -69,20 +69,6 @@ it("已知内容引用、侧边栏、项目集合和标签树都保留模板链�
     nextPage: { href },
     currentPath: href,
   });
-  expect(
-    adapt("quest", {
-      target,
-      answers: [{ source: { target } }, { source: { published: false } }],
-      materials: [{ target }, { url: "https://example.com" }],
-    }),
-  ).toMatchObject({
-    href,
-    answers: [
-      { source: { key: target.key, href } },
-      { source: { published: false, href: undefined } },
-    ],
-    materials: [{ href }, { url: "https://example.com", href: undefined }],
-  });
   // 站点级数据只在清单里出现一次。
   client.readManifest.mockResolvedValue({
     ...manifest,

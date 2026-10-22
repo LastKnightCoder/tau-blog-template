@@ -8,7 +8,6 @@ import { BlogDataProvider, useInitData } from "@blog/services/data-context";
 import { routeFor } from "@blog/services/data";
 import { joinPath } from "@blog/utils";
 import { openSiteLink } from "@blog/utils/navigation";
-import { CiteMark, useCitationIndex } from "@blog/components/Citation";
 import { loadContentLinkPreview, type ContentLinkPreviewData } from "./preview";
 
 type LinkPreviewState = {
@@ -72,12 +71,11 @@ const SiteLinkView = memo(
     enablePreview: boolean;
   }) => {
     const { site } = useInitData();
-    const { identity, target, children } = link;
+    const { target, children } = link;
     const displayTitle = link.title.trim() || COMPACT_CONTENT_LINK_LABEL;
     const shouldCompactLabel =
       !link.title.trim() && link.text.trim() === DEFAULT_CONTENT_LINK_LABEL;
     const targetHref = target ? joinPath(site.basePath, routeFor(target)) : "";
-    const citationIndex = useCitationIndex(identity);
     const canPreview = enablePreview && !!target;
     const [open, setOpen] = useState(false);
     const [previewState, setPreviewState] = useState<LinkPreviewState>({
@@ -155,21 +153,11 @@ const SiteLinkView = memo(
       </a>
     );
 
-    const citeMark =
-      citationIndex != null ? <CiteMark index={citationIndex} /> : null;
-
     if (!enablePreview || !target || !targetHref) {
-      return citeMark ? (
-        <>
-          {linkNode}
-          {citeMark}
-        </>
-      ) : (
-        linkNode
-      );
+      return linkNode;
     }
 
-    const previewLink = (
+    return (
       <Tooltip
         onOpenChange={setOpen}
         placement="bottom"
@@ -180,20 +168,11 @@ const SiteLinkView = memo(
         {linkNode}
       </Tooltip>
     );
-
-    return citeMark ? (
-      <>
-        {previewLink}
-        {citeMark}
-      </>
-    ) : (
-      previewLink
-    );
   },
 );
 SiteLinkView.displayName = "SiteLinkView";
 
-/** 正文站内链接的展示：悬停预览、引用编号与未发布提示；预览里的链接不再嵌套预览。 */
+/** 正文站内链接的展示：悬停预览与未发布提示；预览里的链接不再嵌套预览。 */
 export const renderSiteLink = (link: LinkRenderProps) => (
   <SiteLinkView link={link} enablePreview />
 );

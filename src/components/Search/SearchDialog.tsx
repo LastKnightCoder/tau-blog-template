@@ -314,7 +314,7 @@ const SearchDialog = ({
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={handleKeyDown}
             className="min-w-0 flex-1 bg-transparent text-[15px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)]"
-            placeholder="搜索文章、卡片、文档、求索录"
+            placeholder="搜索文章、卡片、文档"
             aria-label="搜索关键词"
           />
           <button

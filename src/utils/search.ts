@@ -110,7 +110,6 @@ export async function loadBlogSearchIndex(
         card: "卡片",
         article: "文章",
         "project-doc": "项目文档",
-        quest: "求索录",
       }[type],
       href: routeFor(document),
     };

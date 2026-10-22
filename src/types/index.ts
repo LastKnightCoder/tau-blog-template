@@ -32,8 +32,6 @@ export interface ArticleListItem {
   createTime: number;
 }
 
-export type QuestStatus = "not_started" | "in_progress" | "resolved";
-
 // 卡片列表项（用于卡片页面左侧导航）
 export interface CardListItem {
   id: number;
@@ -95,76 +93,6 @@ export interface DocData {
   currentPath?: string;
 }
 
-export interface QuestAnswerData {
-  id: number;
-  createTime: number;
-  updateTime: number;
-  content?: Descendant[];
-  source?: {
-    key?: string;
-    type: "card" | "article" | "project-item" | "custom";
-    id?: number;
-    contentId: number;
-    href?: string;
-    title?: string;
-    published: boolean;
-  };
-}
-
-export type QuestMaterialKind =
-  | "card"
-  | "article"
-  | "project_item"
-  | "project"
-  | "white_board"
-  | "excerpt"
-  | "pdf-annotation"
-  | "web-clip"
-  | "chat-session";
-
-/** 参考资料（据）：index 即正文与轨迹里的引用编号 */
-export interface QuestMaterialData {
-  index: number;
-  kind: QuestMaterialKind;
-  group: "external" | "note" | "discussion";
-  title: string;
-  meta: string;
-  excerpt: string;
-  note?: string;
-  /** 站内已发布页面 */
-  href?: string;
-  /** 外部原处 */
-  url?: string;
-  /** 与正文 content-link 对账的键（contentType:refId） */
-  citeKey?: string;
-}
-
-/** 探索过程（径）的一个节点 */
-export interface QuestTrailEntry {
-  time: number;
-  tone: "start" | "milestone" | "plain" | "note" | "done";
-  text: string;
-  refs: number[];
-}
-
-export interface QuestData {
-  id: number;
-  title: string;
-  summary: string;
-  href: string;
-  groupId: number;
-  groupTitle: string;
-  groupColor?: string;
-  status: QuestStatus;
-  answers: QuestAnswerData[];
-  materials?: QuestMaterialData[];
-  trail?: QuestTrailEntry[];
-  description?: Descendant[];
-  createTime: number;
-  updateTime: number;
-  resolvedTime?: number | null;
-}
-
 export interface DocCollectionItem {
   id: number;
   title: string;
@@ -179,7 +107,7 @@ export interface DocCollection {
   items: DocCollectionItem[];
 }
 
-export type SearchItemType = "card" | "article" | "project-doc" | "quest";
+export type SearchItemType = "card" | "article" | "project-doc";
 
 export interface SearchItem extends Omit<SearchDocument, "type"> {
   type: SearchItemType;
@@ -203,7 +131,7 @@ export interface HomeData {
 
 // 时间线项
 export interface TimelineItem {
-  type: "card" | "article" | "doc" | "quest";
+  type: "card" | "article" | "doc";
   id: number;
   title?: string;
   summary: string;
@@ -215,7 +143,7 @@ export interface TimelineItem {
 // 列表数据
 export interface ListData {
   title: string;
-  type: "card" | "article" | "doc" | "quest";
+  type: "card" | "article" | "doc";
   items: ListItem[];
   tags?: { name: string; count: number }[];
   activeTag?: string;
@@ -229,16 +157,11 @@ export interface ListItem {
   href: string;
   tags: string[];
   createTime: number;
-  updateTime?: number;
-  groupId?: number;
-  groupTitle?: string;
-  status?: QuestStatus;
-  answerCount?: number;
 }
 
 // 页面元数据
 export interface PageMeta {
-  type: "home" | "card" | "article" | "doc" | "list" | "quest";
+  type: "home" | "card" | "article" | "doc" | "list";
   publishTime: number;
 }
 
@@ -253,7 +176,7 @@ export interface InitData {
   search?: {
     href: string;
   };
-  content: CardData | ArticleData | DocData | QuestData | HomeData | ListData;
+  content: CardData | ArticleData | DocData | HomeData | ListData;
   meta: PageMeta;
 }
 

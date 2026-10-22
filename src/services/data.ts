@@ -34,7 +34,6 @@ function routeOf(item: DataManifest["items"][number]): string {
       card: "/cards",
       article: "/articles",
       doc: "/projects",
-      quest: "/quests",
     };
     if (!item.collectionType) throw new Error("集合数据缺少业务类型");
     return routes[item.collectionType];
@@ -95,27 +94,6 @@ function adaptContent(data: Published.PublishedData) {
         },
       };
     }
-    case "quest": {
-      const content = data.content as Published.QuestData;
-      return {
-        ...content,
-        href: routeFor(content.target),
-        answers: content.answers.map((answer) => ({
-          ...answer,
-          source: answer.source && {
-            ...answer.source,
-            key: answer.source.target?.key,
-            href: answer.source.target
-              ? routeFor(answer.source.target)
-              : undefined,
-          },
-        })),
-        materials: content.materials.map((item) => ({
-          ...item,
-          href: item.target ? routeFor(item.target) : undefined,
-        })),
-      };
-    }
     case "list": {
       const content = data.content as Published.ListData;
       return {
@@ -155,7 +133,6 @@ export function adaptData({ data }: DataResult): InitData {
     ...[
       ["card", "卡片"],
       ["article", "文章"],
-      ["quest", "求索录"],
     ].flatMap(([type, label]) =>
       source.items.some(
         (item) => item.type === "list" && item.collectionType === type,
