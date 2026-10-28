@@ -30,8 +30,9 @@ jobs:
       - name: 等待 npm 完成新版本处理
         timeout-minutes: 30
         run: |
+          package=$(node -p "require('./package.json').dependencies['@tau/blog'].replace(/^npm:/, '')")
           for attempt in $(seq 1 60); do
-            if npm view '@xiongtao.xt/tau-blog@0.4.1' version --registry=https://registry.npmjs.org; then
+            if npm view "$package" version --registry=https://registry.npmjs.org; then
               exit 0
             fi
             echo "npm 正在处理新版本，30 秒后重试（$attempt/60）"
