@@ -1,3 +1,4 @@
 minimumReleaseAgeExclude:
   - '@xiongtao.xt/tau-blog@0.6.0'
   - '@xiongtao.xt/tau-blog@0.7.1'
+  - '@xiongtao.xt/tau-blog@0.7.2'
