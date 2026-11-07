@@ -38,12 +38,13 @@ export function Content({
         hrefFor={routeFor}
         renderLink={preview ? renderPreviewLink : renderSiteLink}
         fallback={
-          <p
-            role="status"
-            className="text-sm text-[var(--color-text-tertiary)]"
-          >
-            正在准备正文…
-          </p>
+          <div role="status" aria-label="正在加载正文" className="animate-pulse space-y-3 py-2">
+            <div className="h-4 w-full rounded bg-gray-100" />
+            <div className="h-4 w-5/6 rounded bg-gray-100" />
+            <div className="h-4 w-4/6 rounded bg-gray-100" />
+            <div className="h-4 w-full rounded bg-gray-100" />
+            <div className="h-4 w-3/6 rounded bg-gray-100" />
+          </div>
         }
       />
     </ContentErrorBoundary>
