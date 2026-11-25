@@ -39,11 +39,11 @@ export function Content({
         renderLink={preview ? renderPreviewLink : renderSiteLink}
         fallback={
           <div role="status" aria-label="正在加载正文" className="animate-pulse space-y-3 py-2">
-            <div className="h-4 w-full rounded bg-gray-100" />
-            <div className="h-4 w-5/6 rounded bg-gray-100" />
-            <div className="h-4 w-4/6 rounded bg-gray-100" />
-            <div className="h-4 w-full rounded bg-gray-100" />
-            <div className="h-4 w-3/6 rounded bg-gray-100" />
+            <div className="h-4 w-full rounded bg-[var(--color-border-ring-heavy)]" />
+            <div className="h-4 w-5/6 rounded bg-[var(--color-border-ring-heavy)]" />
+            <div className="h-4 w-4/6 rounded bg-[var(--color-border-ring-heavy)]" />
+            <div className="h-4 w-full rounded bg-[var(--color-border-ring-heavy)]" />
+            <div className="h-4 w-3/6 rounded bg-[var(--color-border-ring-heavy)]" />
           </div>
         }
       />

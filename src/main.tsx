@@ -82,22 +82,22 @@ function BlogRouter({ basePath }: { basePath: string }) {
     return (
       <div role="status" aria-label="正在加载" className="animate-pulse">
         {/* 导航栏骨架 */}
-        <div className="border-b border-gray-100 px-6 py-4 flex items-center gap-4">
-          <div className="h-5 w-24 rounded bg-gray-200" />
+        <div className="border-b border-[var(--color-border-ring)] px-6 py-4 flex items-center gap-4">
+          <div className="h-5 w-24 rounded bg-[var(--color-border-ring-heavy)]" />
           <div className="flex-1" />
-          <div className="h-4 w-16 rounded bg-gray-200" />
-          <div className="h-4 w-16 rounded bg-gray-200" />
-          <div className="h-4 w-16 rounded bg-gray-200" />
+          <div className="h-4 w-16 rounded bg-[var(--color-border-ring-heavy)]" />
+          <div className="h-4 w-16 rounded bg-[var(--color-border-ring-heavy)]" />
+          <div className="h-4 w-16 rounded bg-[var(--color-border-ring-heavy)]" />
         </div>
         {/* 内容区骨架 */}
         <div className="mx-auto max-w-3xl px-6 py-10 space-y-4">
-          <div className="h-8 w-1/2 rounded bg-gray-200" />
-          <div className="h-4 w-full rounded bg-gray-100" />
-          <div className="h-4 w-5/6 rounded bg-gray-100" />
-          <div className="h-4 w-4/6 rounded bg-gray-100" />
-          <div className="mt-8 h-4 w-full rounded bg-gray-100" />
-          <div className="h-4 w-5/6 rounded bg-gray-100" />
-          <div className="h-4 w-3/6 rounded bg-gray-100" />
+          <div className="h-8 w-1/2 rounded bg-[var(--color-border-ring-heavy)]" />
+          <div className="h-4 w-full rounded bg-[var(--color-border-ring-heavy)]" />
+          <div className="h-4 w-5/6 rounded bg-[var(--color-border-ring-heavy)]" />
+          <div className="h-4 w-4/6 rounded bg-[var(--color-border-ring-heavy)]" />
+          <div className="mt-8 h-4 w-full rounded bg-[var(--color-border-ring-heavy)]" />
+          <div className="h-4 w-5/6 rounded bg-[var(--color-border-ring-heavy)]" />
+          <div className="h-4 w-3/6 rounded bg-[var(--color-border-ring-heavy)]" />
         </div>
       </div>
     );
